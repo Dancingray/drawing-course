@@ -123,10 +123,11 @@ footer.records textarea{width:100%;min-height:90px;border:1px solid var(--rule);
 .sheet-head .crumb{font-size:13px;color:var(--blue);font-family:var(--font-display)}
 .sheet-head h3{margin:2px 0 0;font-size:19px;line-height:1.35;overflow-wrap:anywhere;text-wrap:balance}
 .sheet-head .x{margin-left:auto;flex:none;border:0;background:var(--paper);border-radius:99px;width:36px;height:36px;cursor:pointer;font-size:18px}
-.sheet-body{overflow-y:auto;padding:14px 16px 18px;display:grid;gap:16px}
+.sheet-body{overflow-y:auto;padding:14px 16px 18px;display:grid;gap:16px;grid-auto-rows:max-content;align-content:start}
 .player{background:var(--paper);border:1px solid var(--rule);border-radius:12px;overflow:hidden;display:grid}
 .player:empty{display:none}
 .player iframe{width:100%;border:0;display:block;background:#fff}
+.player .tweet{min-height:120px;padding:0 8px}
 .player .gone{padding:24px 16px;text-align:center;color:var(--graphite);font-size:14px}
 .watch{display:grid;gap:6px}
 .watch .btn.primary{width:100%;padding:11px 14px;font-size:15px;background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
@@ -345,7 +346,7 @@ function embedOf(u){
   let m;
   if((m=u.match(/instagram\.com\/(p|reel)\/([\w-]+)/))) return {src:`https://www.instagram.com/${m[1]}/${m[2]}/embed/`,h:m[1]==="reel"?640:600};
   if((m=u.match(/threads\.(?:com|net)\/(@[\w.]+)\/post\/([\w-]+)/))) return {src:`https://www.threads.com/${m[1]}/post/${m[2]}/embed`,h:560};
-  if((m=u.match(/(?:x|twitter)\.com\/[\w]+\/status\/(\d+)/))) return {src:`https://platform.twitter.com/embed/Tweet.html?id=${m[1]}&lang=zh-tw&dnt=true`,h:560};
+  if((m=u.match(/(?:x|twitter)\.com\/[\w]+\/status\/(\d+)/))) return {tweet:m[1],h:560};
   if(/facebook\.com\/(reel\/|[^/]+\/videos\/)/.test(u)) return {src:`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(u)}&show_text=false&width=500`,h:/\/reel\//.test(u)?620:340};
   if(/facebook\.com\/([^/]+\/posts\/|photo\.php)/.test(u)) return {src:`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(u)}&show_text=true&width=500`,h:560};
   return null;
@@ -499,6 +500,13 @@ function lessonRow(l,showUnit){
 
 /* ---------- lesson sheet ---------- */
 let openId=null,returnFocus=null,noteTimer=null;
+let twPromise=null;
+function loadTwitter(){
+  if(!twPromise)twPromise=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://platform.twitter.com/widgets.js";s.async=true;s.charset="utf-8";
+    s.onload=()=>{let n=0;const t=setInterval(()=>{if(window.twttr&&twttr.widgets&&twttr.widgets.createTweet){clearInterval(t);res(twttr);}else if(++n>100){clearInterval(t);twPromise=null;rej();}},100);};
+    s.onerror=()=>{twPromise=null;s.remove();rej();};document.head.appendChild(s);});
+  return twPromise;
+}
 function openLesson(id,from){
   const l=LESSONS.find(x=>x.id===id);if(!l)return;
   openId=id;if(from)returnFocus=from;
@@ -506,6 +514,9 @@ function openLesson(id,from){
   $("#sTitle").textContent=l.title;
   const pl=$("#sPlayer");pl.textContent="";
   if(l.gone){pl.appendChild(el("p",{class:"gone",text:"Threads 回報這則貼文已不存在或無法公開觀看，所以無法播放。"}));}
+  else if(l.embed&&l.embed.tweet){const box=el("div",{class:"tweet"});pl.appendChild(box);
+    loadTwitter().then(tw=>{if(openId!==id)return;return tw.widgets.createTweet(l.embed.tweet,box,{lang:"zh-tw",dnt:true,align:"center"}).then(r=>{if(!r&&openId===id)box.appendChild(el("p",{class:"gone",text:"X 沒有顯示這則貼文（可能已刪除或設為私人），請用下方按鈕到 X 打開。"}));});})
+      .catch(()=>{if(openId===id)box.appendChild(el("p",{class:"gone",text:"X 播放器載入失敗，請用下方按鈕到 X 打開。"}));});}
   else if(l.embed){pl.appendChild(el("iframe",{src:l.embed.src,title:l.title+"（"+l.platform+"）",style:"height:"+l.embed.h+"px",allow:"autoplay; encrypted-media; picture-in-picture; fullscreen",allowfullscreen:"",loading:"lazy",referrerpolicy:"strict-origin-when-cross-origin"}));}
   const a=$("#sOpen");a.href=l.src;a.textContent=`在 ${l.platform} 打開原文 ↗`;
   $("#sOpenNote").textContent=l.gone?"原連結保留在這裡，你可以自己確認。":`播放器空白、要求登入或顯示無法播放時，按上方按鈕到 ${l.platform} 觀看。原文若已刪除或設為私人，兩邊都看不到。`;
