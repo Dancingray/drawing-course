@@ -129,6 +129,11 @@ footer.records textarea{width:100%;min-height:90px;border:1px solid var(--rule);
 .player iframe{width:100%;border:0;display:block;background:#fff}
 .player .tweet{min-height:120px;padding:0 8px}
 .fbbox{display:flex;justify-content:center;background:#000}
+.quiet{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.quiet .btn{font-size:14px;padding:7px 12px}
+#quietBtn[aria-checked="true"]{background:var(--ink);border-color:var(--ink);color:var(--sheet)}
+.quiet small{color:var(--graphite);font-size:12.5px;flex:1 1 200px}
+.quietbox{padding:20px 16px;text-align:center;display:grid;gap:10px;justify-items:center;color:var(--graphite);font-size:14px}
 .pctl{display:grid;gap:6px}
 .pbtns{display:flex;gap:8px;flex-wrap:wrap}
 .pbtns .btn{flex:1 1 140px;font-size:14px;padding:8px 10px}
@@ -167,6 +172,10 @@ footer.records textarea{width:100%;min-height:90px;border:1px solid var(--rule);
     <div class="progress" aria-live="polite">
       <div class="nums" id="nums"></div>
       <div class="bar" aria-hidden="true"><i class="b-done" id="barDone"></i><i class="b-doing" id="barDoing"></i></div>
+    </div>
+    <div class="quiet">
+      <button class="btn" type="button" id="quietBtn" role="switch" aria-checked="false"></button>
+      <small id="quietNote"></small>
     </div>
   </header>
 
@@ -522,7 +531,10 @@ function loadTwitter(){
 }
 const MKEY="drawcourse.mute";
 let fbMute=false;try{fbMute=localStorage.getItem(MKEY)==="1";}catch(e){}
-let fbPlayer=null,fbTarget=null,fbSdk=null,stopped=false;
+let fbPlayer=null,fbTarget=null,fbSdk=null,stopped=false,forceLoad=false;
+const QKEY="drawcourse.quiet";let quiet=false;try{quiet=localStorage.getItem(QKEY)==="1";}catch(e){}
+function syncQuiet(){const b=$("#quietBtn");b.setAttribute("aria-checked",String(quiet));b.textContent=quiet?"🔕 安靜模式：開":"🔔 安靜模式：關";
+  $("#quietNote").textContent=quiet?"課程不會載入影片播放器，只顯示文字和「打開原文」；需要時可在課程裡單獨播放。":"開啟後，課程不載入播放器，完全不會有聲音。";}
 function isFbVideo(l){return !!(l.embed&&!l.embed.tweet&&/facebook\.com\/(reel\/|[^/]+\/videos\/)/.test(l.src));}
 function iframeFor(l){return el("iframe",{src:l.embed.src,title:l.title+"（"+l.platform+"）",style:"height:"+l.embed.h+"px",allow:"autoplay; encrypted-media; picture-in-picture; fullscreen",allowfullscreen:"",loading:"lazy",referrerpolicy:"strict-origin-when-cross-origin"});}
 function loadFb(){
@@ -540,6 +552,7 @@ function renderPlayer(l){
   const pl=$("#sPlayer");clearPlayer();const id=l.id;
   if(l.gone){pl.appendChild(el("p",{class:"gone",text:"Threads 回報這則貼文已不存在或無法公開觀看，所以無法播放。"}));return;}
   if(!l.embed)return;
+  if(quiet&&!forceLoad){pl.appendChild(el("div",{class:"quietbox"},[el("p",{text:"安靜模式開啟中，這堂課沒有載入播放器。"}),(()=>{const b=el("button",{class:"btn",type:"button",text:"▶ 只播放這一堂"});b.addEventListener("click",()=>{forceLoad=true;renderPlayer(l);updateCtl(l);});return b;})()]));return;}
   if(l.embed.tweet){const box=el("div",{class:"tweet"});pl.appendChild(box);
     loadTwitter().then(tw=>{if(openId!==id)return;return tw.widgets.createTweet(l.embed.tweet,box,{lang:"zh-tw",dnt:true,align:"center"}).then(r=>{if(!r&&openId===id)box.appendChild(el("p",{class:"gone",text:"X 沒有顯示這則貼文（可能已刪除或設為私人），請用下方按鈕到 X 打開。"}));});})
       .catch(()=>{if(openId===id)box.appendChild(el("p",{class:"gone",text:"X 播放器載入失敗，請用下方按鈕到 X 打開。"}));});}
@@ -553,7 +566,7 @@ function renderPlayer(l){
   else pl.appendChild(iframeFor(l));
 }
 function updateCtl(l){
-  const has=!!(l&&l.embed&&!l.gone);$("#sCtl").hidden=!has;if(!has)return;
+  const has=!!(l&&l.embed&&!l.gone&&!(quiet&&!forceLoad));$("#sCtl").hidden=!has;if(!has)return;
   $("#sStop").textContent=stopped?"▶ 重新載入播放器":"■ 停止播放";
   const fb=isFbVideo(l),m=$("#sMute");m.hidden=!fb;
   m.setAttribute("aria-pressed",String(fbMute));m.textContent=fbMute?"🔇 Facebook 靜音：開":"🔈 Facebook 靜音：關";
@@ -561,6 +574,8 @@ function updateCtl(l){
     fb?(fbTarget===null&&!fbPlayer&&$("#sPlayer iframe")?"Facebook 靜音工具沒載入成功，請按播放器裡的喇叭圖示，或按「停止播放」。":(fbMute?"Facebook 影片會以靜音播放，再按一次就恢復聲音。這個設定會記住。":"按「Facebook 靜音」可讓這類影片不出聲，這個設定會記住。"))
       :`${l.platform} 不開放網站控制音量：要關聲音請按「停止播放」，或按播放器裡的喇叭圖示。`;
 }
+syncQuiet();
+$("#quietBtn").addEventListener("click",()=>{quiet=!quiet;try{localStorage.setItem(QKEY,quiet?"1":"0");}catch(e){}syncQuiet();});
 $("#sStop").addEventListener("click",()=>{const l=LESSONS.find(x=>x.id===openId);if(!l)return;
   if(stopped){stopped=false;renderPlayer(l);}else{stopped=true;clearPlayer();$("#sPlayer").appendChild(el("p",{class:"gone",text:"已停止播放。"}));}updateCtl(l);});
 $("#sMute").addEventListener("click",()=>{fbMute=!fbMute;try{localStorage.setItem(MKEY,fbMute?"1":"0");}catch(e){}
@@ -572,7 +587,7 @@ function openLesson(id,from){
   openId=id;if(from)returnFocus=from;
   $("#sCrumb").textContent=`單元 ${String(l.unit.idx+1).padStart(2,"0")}・${l.unit.name}・第 ${l.no} 堂`;
   $("#sTitle").textContent=l.title;
-  stopped=false;renderPlayer(l);updateCtl(l);
+  stopped=false;forceLoad=false;renderPlayer(l);updateCtl(l);
   const a=$("#sOpen");a.href=l.src;a.textContent=`在 ${l.platform} 打開原文 ↗`;
   $("#sOpenNote").textContent=l.gone?"原連結保留在這裡，你可以自己確認。":`播放器空白、要求登入或顯示無法播放時，按上方按鈕到 ${l.platform} 觀看。原文若已刪除或設為私人，兩邊都看不到。`;
   $("#sSrc").textContent=l.txt&&l.txt!=="(無內文)"?l.txt:"（收藏裡沒有內文）";
@@ -594,7 +609,7 @@ function syncStatus(){
 }
 function closeLesson(){
   if(!openId)return;flushNote();
-  openId=null;clearPlayer();stopped=false;$("#scrim").classList.remove("open");$("#sheet").classList.remove("open");
+  openId=null;clearPlayer();stopped=false;forceLoad=false;$("#scrim").classList.remove("open");$("#sheet").classList.remove("open");
   document.body.style.overflow="";render();
   if(returnFocus&&document.body.contains(returnFocus))returnFocus.focus();
 }
