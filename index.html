@@ -128,6 +128,11 @@ footer.records textarea{width:100%;min-height:90px;border:1px solid var(--rule);
 .player:empty{display:none}
 .player iframe{width:100%;border:0;display:block;background:#fff}
 .player .tweet{min-height:120px;padding:0 8px}
+.pctl{display:grid;gap:6px}
+.pbtns{display:flex;gap:8px;flex-wrap:wrap}
+.pbtns .btn{flex:1 1 140px;font-size:14px;padding:8px 10px}
+#sMute[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--sheet)}
+.pctl small{color:var(--graphite);font-size:12.5px;line-height:1.5}
 .player .gone{padding:24px 16px;text-align:center;color:var(--graphite);font-size:14px}
 .watch{display:grid;gap:6px}
 .watch .btn.primary{width:100%;padding:11px 14px;font-size:15px;background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
@@ -206,6 +211,13 @@ footer.records textarea{width:100%;min-height:90px;border:1px solid var(--rule);
   </div>
   <div class="sheet-body">
     <div class="player" id="sPlayer"></div>
+    <div class="pctl" id="sCtl" hidden>
+      <div class="pbtns">
+        <button class="btn" type="button" id="sStop">■ 停止播放</button>
+        <button class="btn" type="button" id="sMute" aria-pressed="false" hidden>🔇 Facebook 靜音：關</button>
+      </div>
+      <small id="sCtlNote"></small>
+    </div>
     <div class="watch">
       <a class="btn primary" id="sOpen" href="#" target="_blank" rel="noopener noreferrer"></a>
       <small id="sOpenNote"></small>
@@ -507,17 +519,58 @@ function loadTwitter(){
     s.onerror=()=>{twPromise=null;s.remove();rej();};document.head.appendChild(s);});
   return twPromise;
 }
+const MKEY="drawcourse.mute";
+let fbMute=false;try{fbMute=localStorage.getItem(MKEY)==="1";}catch(e){}
+let fbPlayer=null,fbTarget=null,fbSdk=null,stopped=false;
+function isFbVideo(l){return !!(l.embed&&!l.embed.tweet&&/facebook\.com\/(reel\/|[^/]+\/videos\/)/.test(l.src));}
+function iframeFor(l){return el("iframe",{src:l.embed.src,title:l.title+"（"+l.platform+"）",style:"height:"+l.embed.h+"px",allow:"autoplay; encrypted-media; picture-in-picture; fullscreen",allowfullscreen:"",loading:"lazy",referrerpolicy:"strict-origin-when-cross-origin"});}
+function loadFb(){
+  if(window.FB&&FB.XFBML)return Promise.resolve(FB);
+  if(!fbSdk)fbSdk=new Promise((res,rej)=>{
+    window.fbAsyncInit=()=>{FB.init({xfbml:false,version:"v23.0"});
+      FB.Event.subscribe("xfbml.ready",m=>{if(m.type!=="video"||!fbTarget||(m.id&&m.id!==fbTarget))return;fbPlayer=m.instance;if(fbMute){try{fbPlayer.mute();}catch(e){}}});
+      res(FB);};
+    const sc=document.createElement("script");sc.src="https://connect.facebook.net/zh_TW/sdk.js";sc.async=true;sc.crossOrigin="anonymous";
+    sc.onerror=()=>{fbSdk=null;sc.remove();rej();};document.body.appendChild(sc);setTimeout(rej,10000);});
+  return fbSdk;
+}
+function clearPlayer(){$("#sPlayer").textContent="";fbPlayer=null;fbTarget=null;}
+function renderPlayer(l){
+  const pl=$("#sPlayer");clearPlayer();const id=l.id;
+  if(l.gone){pl.appendChild(el("p",{class:"gone",text:"Threads 回報這則貼文已不存在或無法公開觀看，所以無法播放。"}));return;}
+  if(!l.embed)return;
+  if(l.embed.tweet){const box=el("div",{class:"tweet"});pl.appendChild(box);
+    loadTwitter().then(tw=>{if(openId!==id)return;return tw.widgets.createTweet(l.embed.tweet,box,{lang:"zh-tw",dnt:true,align:"center"}).then(r=>{if(!r&&openId===id)box.appendChild(el("p",{class:"gone",text:"X 沒有顯示這則貼文（可能已刪除或設為私人），請用下方按鈕到 X 打開。"}));});})
+      .catch(()=>{if(openId===id)box.appendChild(el("p",{class:"gone",text:"X 播放器載入失敗，請用下方按鈕到 X 打開。"}));});}
+  else if(isFbVideo(l)){
+    const vid="fbv"+Date.now();fbTarget=vid;const box=el("div",{class:"fbbox"});pl.appendChild(box);
+    loadFb().then(FB=>{if(openId!==id||fbTarget!==vid)return;
+      const w=Math.round(Math.min(500,Math.max(240,pl.clientWidth-2)));
+      box.appendChild(el("div",{class:"fb-video",id:vid,"data-href":l.src,"data-width":String(w),"data-show-text":"false","data-allowfullscreen":"true"}));FB.XFBML.parse(box);})
+    .catch(()=>{if(openId===id&&fbTarget===vid){fbTarget=null;box.replaceWith(iframeFor(l));updateCtl(l);}});
+  }
+  else pl.appendChild(iframeFor(l));
+}
+function updateCtl(l){
+  const has=!!(l&&l.embed&&!l.gone);$("#sCtl").hidden=!has;if(!has)return;
+  $("#sStop").textContent=stopped?"▶ 重新載入播放器":"■ 停止播放";
+  const fb=isFbVideo(l),m=$("#sMute");m.hidden=!fb;
+  m.setAttribute("aria-pressed",String(fbMute));m.textContent=fbMute?"🔇 Facebook 靜音：開":"🔈 Facebook 靜音：關";
+  $("#sCtlNote").textContent=stopped?"播放器已移除，聲音已停止。":
+    fb?(fbTarget===null&&!fbPlayer&&$("#sPlayer iframe")?"Facebook 靜音工具沒載入成功，請按播放器裡的喇叭圖示，或按「停止播放」。":"靜音開啟時，Facebook 影片會以靜音播放（這個設定會記住）。要恢復聲音，關掉靜音後，再按播放器裡的喇叭圖示。")
+      :`${l.platform} 不開放網站控制音量：要關聲音請按「停止播放」，或按播放器裡的喇叭圖示。`;
+}
+$("#sStop").addEventListener("click",()=>{const l=LESSONS.find(x=>x.id===openId);if(!l)return;
+  if(stopped){stopped=false;renderPlayer(l);}else{stopped=true;clearPlayer();$("#sPlayer").appendChild(el("p",{class:"gone",text:"已停止播放。"}));}updateCtl(l);});
+$("#sMute").addEventListener("click",()=>{fbMute=!fbMute;try{localStorage.setItem(MKEY,fbMute?"1":"0");}catch(e){}
+  if(fbPlayer){try{fbMute?fbPlayer.mute():fbPlayer.unmute();}catch(e){}}
+  updateCtl(LESSONS.find(x=>x.id===openId));});
 function openLesson(id,from){
   const l=LESSONS.find(x=>x.id===id);if(!l)return;
   openId=id;if(from)returnFocus=from;
   $("#sCrumb").textContent=`單元 ${String(l.unit.idx+1).padStart(2,"0")}・${l.unit.name}・第 ${l.no} 堂`;
   $("#sTitle").textContent=l.title;
-  const pl=$("#sPlayer");pl.textContent="";
-  if(l.gone){pl.appendChild(el("p",{class:"gone",text:"Threads 回報這則貼文已不存在或無法公開觀看，所以無法播放。"}));}
-  else if(l.embed&&l.embed.tweet){const box=el("div",{class:"tweet"});pl.appendChild(box);
-    loadTwitter().then(tw=>{if(openId!==id)return;return tw.widgets.createTweet(l.embed.tweet,box,{lang:"zh-tw",dnt:true,align:"center"}).then(r=>{if(!r&&openId===id)box.appendChild(el("p",{class:"gone",text:"X 沒有顯示這則貼文（可能已刪除或設為私人），請用下方按鈕到 X 打開。"}));});})
-      .catch(()=>{if(openId===id)box.appendChild(el("p",{class:"gone",text:"X 播放器載入失敗，請用下方按鈕到 X 打開。"}));});}
-  else if(l.embed){pl.appendChild(el("iframe",{src:l.embed.src,title:l.title+"（"+l.platform+"）",style:"height:"+l.embed.h+"px",allow:"autoplay; encrypted-media; picture-in-picture; fullscreen",allowfullscreen:"",loading:"lazy",referrerpolicy:"strict-origin-when-cross-origin"}));}
+  stopped=false;renderPlayer(l);updateCtl(l);
   const a=$("#sOpen");a.href=l.src;a.textContent=`在 ${l.platform} 打開原文 ↗`;
   $("#sOpenNote").textContent=l.gone?"原連結保留在這裡，你可以自己確認。":`播放器空白、要求登入或顯示無法播放時，按上方按鈕到 ${l.platform} 觀看。原文若已刪除或設為私人，兩邊都看不到。`;
   $("#sSrc").textContent=l.txt&&l.txt!=="(無內文)"?l.txt:"（收藏裡沒有內文）";
@@ -539,7 +592,7 @@ function syncStatus(){
 }
 function closeLesson(){
   if(!openId)return;flushNote();
-  openId=null;$("#sPlayer").textContent="";$("#scrim").classList.remove("open");$("#sheet").classList.remove("open");
+  openId=null;clearPlayer();stopped=false;$("#scrim").classList.remove("open");$("#sheet").classList.remove("open");
   document.body.style.overflow="";render();
   if(returnFocus&&document.body.contains(returnFocus))returnFocus.focus();
 }
