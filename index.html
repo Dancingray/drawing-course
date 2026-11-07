@@ -572,8 +572,8 @@ function renderPlayer(l){
   else if(l.embed.ig){
     const box=el("div",{class:"igbox"});const bq=el("blockquote",{class:"instagram-media","data-instgrm-permalink":l.embed.ig+"?utm_source=ig_embed","data-instgrm-version":"14"});
     box.appendChild(bq);pl.appendChild(box);
-    const fallback=()=>{if(openId===id&&box.isConnected&&!box.querySelector("iframe"))box.replaceWith(iframeFor(l));};
-    loadIg().then(ig=>{if(openId!==id||!box.isConnected)return;ig.Embeds.process();setTimeout(fallback,10000);}).catch(fallback);
+    const fallback=()=>{if(openId!==id||!box.isConnected)return;const f=box.querySelector("iframe");if(!f||f.offsetHeight<60)box.replaceWith(iframeFor(l));};
+    loadIg().then(ig=>{if(openId!==id||!box.isConnected)return;ig.Embeds.process();setTimeout(fallback,8000);}).catch(fallback);
   }
   else if(isFbVideo(l)){
     const vid="fbv"+Date.now();fbTarget=vid;const box=el("div",{class:"fbbox"});pl.appendChild(box);
