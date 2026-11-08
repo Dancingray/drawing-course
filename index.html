@@ -2,276 +2,526 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>繪圖靈感課程庫</title>
+<meta name="description" content="整理自 266 則繪圖收藏的線上課程：依單元學習、在頁面內播放影片、記錄練習進度。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* Layout idea: a sketchbook syllabus. Blue-pencil construction lines on cool paper; one column on phones, list + wider sheet on desktop. */
+/* ============ Design tokens ============ */
 :root{
-  --paper:#f3f5f8;
-  --sheet:#ffffff;
-  --ink:#1d2430;
-  --graphite:#5b6577;
-  --rule:#d9dee7;
-  --blue:#2f5fd0;
-  --blue-soft:#e3eafb;
-  --todo:#8a93a3;
-  --doing:#c27a12;
-  --doing-soft:#fbefd9;
-  --done:#1f8a5b;
-  --done-soft:#dcf2e7;
-  --font-display:"LXGW WenKai TC","Noto Sans TC",system-ui,sans-serif;
-  --font-body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  /* color */
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f1f3f6; --surface-3:#e8ebf0;
+  --border:#e3e6eb; --border-strong:#cdd2da;
+  --text:#111827; --text-2:#4b5563; --text-3:#646b78;
+  --primary:#2563eb; --primary-hover:#1d4ed8; --primary-soft:#eef3ff; --primary-text:#1d4ed8; --on-primary:#ffffff;
+  --success:#15803d; --success-soft:#e7f6ec;
+  --warning:#b45309; --warning-soft:#fdf3e1;
+  --danger:#b91c1c; --danger-soft:#fdecec;
+  --scrim:rgba(15,23,42,.5);
+  /* type */
+  --font:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --fs-xs:12px; --fs-sm:14px; --fs-md:16px; --fs-lg:20px; --fs-xl:24px; --fs-2xl:32px;
+  /* space (4pt) */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s10:40px;
+  /* radius */
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-pill:999px;
+  /* elevation */
+  --sh-1:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.07);
+  --sh-2:0 16px 40px rgba(16,24,40,.18),0 4px 12px rgba(16,24,40,.08);
+  /* sizes */
+  --h-ctl:40px; --h-ctl-sm:36px; --topbar:60px;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#14181f;--sheet:#1c212b;--ink:#e6eaf1;--graphite:#a2abbb;--rule:#2d3441;
-    --blue:#7fa2ff;--blue-soft:#22304f;--todo:#8790a0;--doing:#f0aa45;--doing-soft:#3a2d17;--done:#4cc890;--done-soft:#163628;
+    --bg:#0f1218; --surface:#171b23; --surface-2:#1e232d; --surface-3:#272d39;
+    --border:#2a303c; --border-strong:#3a4250;
+    --text:#e8ebf1; --text-2:#b3bbc8; --text-3:#9aa3b2;
+    --primary:#5b8cff; --primary-hover:#7aa2ff; --primary-soft:#1c2a4a; --primary-text:#9db9ff; --on-primary:#0b1020;
+    --success:#4ccb84; --success-soft:#14301f; --warning:#f0aa45; --warning-soft:#33280f; --danger:#ff7b7b; --danger-soft:#3a1717;
+    --scrim:rgba(0,0,0,.6);
+    --sh-1:0 1px 2px rgba(0,0,0,.3); --sh-2:0 16px 40px rgba(0,0,0,.5);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#14181f;--sheet:#1c212b;--ink:#e6eaf1;--graphite:#a2abbb;--rule:#2d3441;
-  --blue:#7fa2ff;--blue-soft:#22304f;--todo:#8790a0;--doing:#f0aa45;--doing-soft:#3a2d17;--done:#4cc890;--done-soft:#163628;
+  --bg:#0f1218; --surface:#171b23; --surface-2:#1e232d; --surface-3:#272d39;
+  --border:#2a303c; --border-strong:#3a4250;
+  --text:#e8ebf1; --text-2:#b3bbc8; --text-3:#9aa3b2;
+  --primary:#5b8cff; --primary-hover:#7aa2ff; --primary-soft:#1c2a4a; --primary-text:#9db9ff; --on-primary:#0b1020;
+  --success:#4ccb84; --success-soft:#14301f; --warning:#f0aa45; --warning-soft:#33280f; --danger:#ff7b7b; --danger-soft:#3a1717;
+  --scrim:rgba(0,0,0,.6);
+  --sh-1:0 1px 2px rgba(0,0,0,.3); --sh-2:0 16px 40px rgba(0,0,0,.5);
   color-scheme:dark;
 }
+
+/* ============ Base ============ */
 *{box-sizing:border-box}
 html,body{margin:0}
-body{
-  background:var(--paper);
-  color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;
-}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:var(--fs-md);line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 button,input,textarea,select{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.wrap{max-width:860px;margin:0 auto;padding:0 16px 64px}
-header.top{padding:28px 0 12px;display:grid;gap:10px}
-h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,7vw,40px);line-height:1.15;margin:0;text-wrap:balance}
-h1 .pencil{color:var(--blue)}
-.lede{margin:0;color:var(--graphite);max-width:60ch}
-.progress{display:grid;gap:6px;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px 14px}
-.progress .nums{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--graphite);font-variant-numeric:tabular-nums}
-.progress .nums b{color:var(--ink);font-weight:700}
-.bar{height:8px;border-radius:99px;background:var(--rule);overflow:hidden;display:flex}
-.bar i{display:block;height:100%}
-.bar .b-done{background:var(--done)}
-.bar .b-doing{background:var(--doing)}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed}
+a{color:var(--primary-text)}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:var(--r-sm)}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.i-sm{width:16px;height:16px}
+h1,h2,h3,h4{margin:0;line-height:1.3}
 
-.tools{position:sticky;top:0;z-index:5;background:var(--paper);padding:10px 0 8px;display:grid;gap:8px;border-bottom:1px solid var(--rule)}
-.search{display:flex;align-items:center;gap:8px;background:var(--sheet);border:1.5px solid var(--rule);border-radius:12px;padding:0 12px}
-.search:focus-within{border-color:var(--blue)}
-.search input{flex:1;border:0;background:transparent;padding:12px 0;outline:none;min-width:0}
-.search button{border:0;background:none;color:var(--graphite);cursor:pointer;padding:6px;font-size:14px}
-.qs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.qs::-webkit-scrollbar,.mods::-webkit-scrollbar{display:none}
-.qs button{flex:none;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:99px;padding:4px 12px;font-size:13px;cursor:pointer}
-.row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.seg{display:inline-flex;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:3px;gap:2px}
-.seg button{border:0;background:transparent;border-radius:7px;padding:5px 10px;font-size:13px;cursor:pointer;color:var(--graphite)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
-.count{font-size:13px;color:var(--graphite);margin-left:auto;font-variant-numeric:tabular-nums}
-.mods{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.mods button{flex:none;border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;display:flex;gap:6px;align-items:baseline}
-.mods button small{color:var(--graphite);font-variant-numeric:tabular-nums}
-.mods button[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
-.mods button[aria-pressed="true"] small{color:var(--blue)}
+/* ============ Components ============ */
+/* Button */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:var(--h-ctl);padding:0 var(--s4);border-radius:var(--r-sm);border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:500;line-height:1.2;text-decoration:none;white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--surface-2)}
+.btn:disabled{opacity:.45}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.btn-primary:hover:not(:disabled){background:var(--primary-hover);border-color:var(--primary-hover)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+.btn-ghost:hover:not(:disabled){background:var(--surface-2);color:var(--text)}
+.btn-icon{width:var(--h-ctl);padding:0}
+.btn-block{width:100%}
+.btn[aria-pressed="true"],.btn[aria-checked="true"]{background:var(--primary-soft);border-color:var(--primary);color:var(--primary-text)}
 
-.unit{margin-top:22px}
-.unit-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:0 2px 6px;border-bottom:2px solid var(--ink)}
-.unit-head .no{font-family:var(--font-display);color:var(--blue);font-size:15px}
-.unit-head h2{font-family:var(--font-display);font-size:22px;margin:0;text-wrap:balance}
-.unit-head .meta{margin-left:auto;font-size:13px;color:var(--graphite);font-variant-numeric:tabular-nums}
-.unit-desc{margin:8px 2px 4px;color:var(--graphite);font-size:14px;max-width:65ch}
-ol.lessons{list-style:none;margin:0;padding:0}
-ol.lessons li{border-bottom:1px solid var(--rule)}
-.lesson{width:100%;display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;text-align:left;background:transparent;border:0;padding:11px 2px;cursor:pointer}
-.lesson:hover{background:var(--sheet)}
-.lesson .n{font-family:var(--font-display);color:var(--graphite);font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
-.lesson .t{min-width:0}
-.lesson .t b{display:block;font-weight:500;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.lesson .t b.unknown{color:var(--graphite);font-style:italic;font-weight:400}
-.lesson .t span{font-size:12px;color:var(--graphite)}
-.pill{font-size:12px;border-radius:99px;padding:2px 9px;white-space:nowrap;border:1px solid var(--rule);color:var(--todo)}
-.pill.doing{background:var(--doing-soft);color:var(--doing);border-color:transparent}
-.pill.done{background:var(--done-soft);color:var(--done);border-color:transparent}
-.empty{padding:40px 8px;text-align:center;color:var(--graphite)}
-.empty button{margin-top:10px}
+/* Chip */
+.chip{display:inline-flex;align-items:center;gap:var(--s1);flex:none;min-height:var(--h-ctl-sm);padding:0 var(--s3);border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface);color:var(--text-2);font-size:var(--fs-sm);white-space:nowrap}
+.chip:hover{border-color:var(--border-strong);color:var(--text)}
+.chip[aria-pressed="true"]{background:var(--primary-soft);border-color:var(--primary);color:var(--primary-text)}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--rule);background:var(--sheet);border-radius:10px;padding:9px 14px;cursor:pointer;text-decoration:none;color:var(--ink);font-size:15px}
-.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+/* Segmented control */
+.seg{display:inline-flex;padding:3px;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm)}
+.seg button{flex:1;min-height:34px;padding:0 var(--s3);border:0;border-radius:6px;background:transparent;color:var(--text-2);font-size:var(--fs-sm);font-weight:500;white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--sh-1)}
 
-footer.records{margin-top:40px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:16px;display:grid;gap:10px}
-footer.records h2{font-family:var(--font-display);font-size:20px;margin:0}
-footer.records p{margin:0;color:var(--graphite);font-size:14px;max-width:65ch}
-footer.records .acts{display:flex;gap:8px;flex-wrap:wrap}
-footer.records textarea{width:100%;min-height:90px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);padding:8px;font-size:13px}
-.msg{font-size:14px;min-height:1.4em}
-.msg.err{color:#c43b3b}
-.msg.ok{color:var(--done)}
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 var(--s2);border-radius:6px;font-size:var(--fs-xs);font-weight:500;white-space:nowrap;background:var(--surface-2);color:var(--text-2)}
+.badge-primary{background:var(--primary-soft);color:var(--primary-text)}
+.badge-warning{background:var(--warning-soft);color:var(--warning)}
+.badge-success{background:var(--success-soft);color:var(--success)}
 
-/* Lesson sheet */
-.scrim{position:fixed;inset:0;background:rgba(10,14,22,.45);z-index:20;display:none}
-.scrim.open{display:block}
-.sheet{position:fixed;z-index:21;left:0;right:0;bottom:0;max-height:92%;background:var(--sheet);border-radius:16px 16px 0 0;display:none;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.2)}
-.sheet.open{display:flex}
-@media (min-width:760px){
-  .sheet{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:min(680px,calc(100% - 32px));max-height:88%;border-radius:16px}
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--sh-1)}
+
+/* Input */
+.field{display:flex;align-items:center;gap:var(--s2);min-height:var(--h-ctl);padding:0 var(--s3);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-sm)}
+.field:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.field input{flex:1;min-width:0;border:0;background:transparent;padding:0;height:38px;font-size:var(--fs-sm)}
+.field input::placeholder{color:var(--text-3)}
+.field input::-webkit-search-cancel-button{display:none}
+.field .i{color:var(--text-3)}
+textarea.input{width:100%;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);padding:var(--s3);font-size:var(--fs-sm);line-height:1.6;resize:vertical}
+textarea.input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+kbd{font-family:inherit;font-size:var(--fs-xs);border:1px solid var(--border-strong);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--text-2);background:var(--surface)}
+
+/* Toast */
+.toasts{position:fixed;z-index:80;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));display:grid;gap:var(--s2);width:min(440px,calc(100vw - 32px));pointer-events:none}
+.toast{display:flex;gap:var(--s2);align-items:flex-start;padding:var(--s3) var(--s4);border-radius:var(--r-sm);background:var(--text);color:var(--bg);font-size:var(--fs-sm);box-shadow:var(--sh-2);pointer-events:auto}
+.toast .i{margin-top:1px}
+.toast.ok .i{color:#4ade80}
+.toast.err{background:var(--danger);color:#fff}
+@media (min-width:1024px){.toasts{bottom:var(--s6)}}
+
+/* Skeleton / spinner */
+.spinner{width:22px;height:22px;border-radius:50%;border:3px solid var(--border-strong);border-top-color:var(--primary);flex:none}
+@media (prefers-reduced-motion:no-preference){
+  .spinner{animation:spin .8s linear infinite}
+  .pl-loading{background-size:200% 100%;animation:shimmer 1.6s linear infinite}
+  .toast{animation:rise .2s ease-out}
+  .btn,.chip,.seg button,.lesson,.unit-nav button,.pill{transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s}
 }
-.sheet-head{display:flex;gap:10px;align-items:flex-start;padding:16px 16px 10px;border-bottom:1px solid var(--rule)}
-.sheet-head .crumb{font-size:13px;color:var(--blue);font-family:var(--font-display)}
-.sheet-head h3{margin:2px 0 0;font-size:19px;line-height:1.35;overflow-wrap:anywhere;text-wrap:balance}
-.sheet-head .x{margin-left:auto;flex:none;border:0;background:var(--paper);border-radius:99px;width:36px;height:36px;cursor:pointer;font-size:18px}
-.sheet-body{overflow-y:auto;padding:14px 16px 18px;display:grid;gap:16px;grid-auto-rows:max-content;align-content:start}
-.player{background:var(--paper);border:1px solid var(--rule);border-radius:12px;overflow:hidden;display:grid}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+
+/* Dialog */
+dialog.modal{border:0;padding:0;border-radius:var(--r-lg);background:var(--surface);color:var(--text);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);box-shadow:var(--sh-2)}
+dialog.modal::backdrop{background:var(--scrim)}
+.modal-head{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s4) var(--s3) var(--s5);border-bottom:1px solid var(--border)}
+.modal-head h2{font-size:var(--fs-lg);font-weight:700;flex:1}
+.modal-body{padding:var(--s5);display:grid;gap:var(--s4);overflow:auto}
+.modal-body p{margin:0;color:var(--text-2);font-size:var(--fs-sm)}
+.msg{font-size:var(--fs-sm);min-height:1.4em;margin:0}
+.msg.err{color:var(--danger)}
+.msg.ok{color:var(--success)}
+@media (max-width:639px){
+  dialog.sheetlike{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:var(--r-lg) var(--r-lg) 0 0;max-height:85vh;padding-bottom:env(safe-area-inset-bottom)}
+}
+
+/* ============ Top bar ============ */
+.topbar{position:sticky;top:0;z-index:30;height:var(--topbar);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:saturate(1.4) blur(8px);-webkit-backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--border)}
+.topbar-in{max-width:1320px;height:100%;margin:0 auto;padding:0 var(--s4);display:flex;align-items:center;gap:var(--s3)}
+.brand{display:flex;align-items:center;gap:var(--s2);font-weight:700;font-size:var(--fs-md);color:var(--text);text-decoration:none;flex:none}
+.brand-mark{width:32px;height:32px;border-radius:var(--r-sm);background:var(--primary);color:var(--on-primary);display:grid;place-items:center}
+.brand-mark .i{width:18px;height:18px}
+.brand-name{display:none}
+.topbar .search{flex:1;min-width:0;max-width:560px;margin:0 auto}
+.topbar .search kbd{display:none}
+.top-actions{display:flex;gap:var(--s1);flex:none}
+.top-actions .lbl{display:none}
+@media (min-width:640px){
+  .brand-name{display:inline}
+  .topbar .search kbd{display:inline}
+}
+@media (min-width:1024px){
+  .top-actions .btn{padding:0 var(--s3);width:auto}
+  .top-actions .lbl{display:inline}
+}
+
+/* ============ Layout ============ */
+.layout{max-width:1320px;margin:0 auto;padding:0 var(--s4) var(--s10)}
+.sidebar{display:none}
+@media (min-width:1024px){
+  .layout{display:grid;grid-template-columns:264px minmax(0,1fr);gap:var(--s8);padding:0 var(--s6) var(--s10)}
+  .sidebar{display:block;position:sticky;top:var(--topbar);align-self:start;max-height:calc(100vh - var(--topbar));overflow-y:auto;padding:var(--s6) 0 var(--s6)}
+}
+.side-title{font-size:var(--fs-xs);font-weight:700;letter-spacing:.06em;color:var(--text-3);padding:0 var(--s3) var(--s2)}
+.unit-nav{display:grid;gap:2px}
+.unit-nav button{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px var(--s2);width:100%;min-height:var(--h-ctl);padding:var(--s2) var(--s3);border:0;border-radius:var(--r-sm);background:transparent;text-align:left;color:var(--text-2);font-size:var(--fs-sm)}
+.unit-nav button:hover{background:var(--surface-3);color:var(--text)}
+.unit-nav button[aria-pressed="true"]{background:var(--primary-soft);color:var(--primary-text);font-weight:500}
+.unit-nav .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unit-nav .ct{font-size:var(--fs-xs);color:var(--text-3);font-variant-numeric:tabular-nums}
+.unit-nav button[aria-pressed="true"] .ct{color:var(--primary-text)}
+.unit-nav .mini{grid-column:1/-1;height:3px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+.unit-nav .mini i{display:block;height:100%;background:var(--success)}
+
+/* Page header */
+.page-head{padding:var(--s6) 0 var(--s4);display:grid;gap:var(--s4)}
+.page-head h1{font-size:var(--fs-xl);font-weight:700;letter-spacing:-.01em}
+.page-head .sub{margin:var(--s1) 0 0;color:var(--text-2);font-size:var(--fs-sm)}
+@media (min-width:1024px){.page-head h1{font-size:var(--fs-2xl)}}
+.stats{padding:var(--s3) var(--s4);display:grid;gap:var(--s3)}
+.stats .nums{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s5)}
+.stat{display:flex;align-items:baseline;gap:6px;font-size:var(--fs-sm);color:var(--text-2)}
+.stat b{font-size:var(--fs-lg);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.stat .dot{width:8px;height:8px;border-radius:50%;align-self:center;background:var(--border-strong)}
+.stat.done .dot{background:var(--success)} .stat.doing .dot{background:var(--warning)}
+.bar{height:8px;border-radius:var(--r-pill);background:var(--surface-3);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.bar .b-done{background:var(--success)} .bar .b-doing{background:var(--warning)}
+
+/* Toolbar */
+.toolbar{display:grid;gap:var(--s3);padding-bottom:var(--s2)}
+.tb-row{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap}
+.tb-row .seg{flex:1 1 auto;max-width:420px}
+#unitBtn{flex:none;max-width:100%}
+#unitBtn .lbl{overflow:hidden;text-overflow:ellipsis}
+@media (min-width:1024px){#unitBtn{display:none}}
+.qs-wrap{display:flex;gap:var(--s2);align-items:center;min-width:0}
+.qs-wrap .k{flex:none;font-size:var(--fs-xs);font-weight:700;color:var(--text-3);letter-spacing:.04em}
+.qs{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;min-width:0;mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}
+.qs::-webkit-scrollbar{display:none}
+.count{font-size:var(--fs-sm);color:var(--text-3);font-variant-numeric:tabular-nums;margin-left:auto}
+
+/* Lesson list */
+.unit{margin-top:var(--s4);overflow:hidden}
+.unit-head{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s4) var(--s5) var(--s3)}
+.unit-head .hd{flex:1;min-width:0}
+.unit-no{font-size:var(--fs-xs);font-weight:700;color:var(--primary-text);letter-spacing:.04em}
+.unit-head h2{font-size:var(--fs-lg);font-weight:700;margin-top:2px}
+.unit-desc{margin:var(--s1) 0 0;color:var(--text-2);font-size:var(--fs-sm);max-width:70ch}
+.unit-meta{flex:none;margin-top:2px}
+ol.lessons{list-style:none;margin:0;padding:0}
+li.row{display:flex;align-items:center;gap:var(--s2);border-top:1px solid var(--border);padding-right:var(--s4)}
+li.row:hover{background:var(--surface-2)}
+.lesson{flex:1;min-width:0;display:grid;grid-template-columns:36px minmax(0,1fr);gap:var(--s3);align-items:center;padding:var(--s3) 0 var(--s3) var(--s4);background:none;border:0;text-align:left;color:inherit;border-radius:0}
+.lesson .n{display:none;font-size:var(--fs-sm);color:var(--text-3);text-align:right;font-variant-numeric:tabular-nums}
+@media (min-width:640px){.lesson{grid-template-columns:28px 36px minmax(0,1fr);padding-left:var(--s3)}.lesson .n{display:block}}
+.plat{width:36px;height:36px;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--surface-2);color:var(--text-2)}
+.plat.p-ig{background:#fdeef5;color:#c13584} .plat.p-fb{background:#e9f0fe;color:#1877f2} .plat.p-th,.plat.p-x{background:var(--surface-3);color:var(--text)}
+:root[data-theme="dark"] .plat.p-ig{background:#3a1a2c;color:#ff7ab8} :root[data-theme="dark"] .plat.p-fb{background:#16264a;color:#7aa8ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .plat.p-ig{background:#3a1a2c;color:#ff7ab8}:root:not([data-theme="light"]) .plat.p-fb{background:#16264a;color:#7aa8ff}}
+.lesson .t{min-width:0;display:grid;gap:2px}
+.lesson .t b{font-weight:500;font-size:15px;line-height:1.45;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lesson .meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px var(--s2);font-size:var(--fs-xs);color:var(--text-3)}
+.lesson .meta .i{width:13px;height:13px}
+.pill{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:var(--h-ctl-sm);padding:0 var(--s3);border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface);color:var(--text-2);font-size:var(--fs-xs);font-weight:500;white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;border:1.5px solid var(--text-3)}
+.pill:hover{border-color:var(--border-strong)}
+.pill.doing{background:var(--warning-soft);border-color:transparent;color:var(--warning)}
+.pill.doing::before{border-color:var(--warning);background:linear-gradient(90deg,var(--warning) 50%,transparent 50%)}
+.pill.done{background:var(--success-soft);border-color:transparent;color:var(--success)}
+.pill.done::before{border-color:var(--success);background:var(--success)}
+
+/* Empty state */
+.empty{margin-top:var(--s4);padding:var(--s10) var(--s5);text-align:center;display:grid;justify-items:center;gap:var(--s3)}
+.empty-ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--text-3)}
+.empty h2{font-size:var(--fs-md);font-weight:700}
+.empty p{margin:0;color:var(--text-2);font-size:var(--fs-sm);max-width:44ch}
+.empty .sugg{display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:center;align-items:center;font-size:var(--fs-sm);color:var(--text-3)}
+.page-foot{margin-top:var(--s8);color:var(--text-3);font-size:var(--fs-xs);display:grid;gap:var(--s1)}
+.page-foot p{margin:0}
+
+/* ============ Lesson view ============ */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:39;display:none}
+.scrim.open{display:block}
+.sheet{position:fixed;z-index:40;inset:0;background:var(--surface);display:none;flex-direction:column}
+.sheet.open{display:flex}
+@media (min-width:640px){
+  .sheet{inset:16px auto 16px 50%;transform:translateX(-50%);width:min(760px,calc(100vw - 32px));border-radius:var(--r-lg);box-shadow:var(--sh-2);overflow:hidden}
+}
+@media (min-width:1024px){
+  .sheet{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:min(1180px,calc(100vw - 48px));height:min(900px,calc(100vh - 48px))}
+}
+.sheet-head{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s3) var(--s3) var(--s4);border-bottom:1px solid var(--border);padding-top:calc(var(--s3) + env(safe-area-inset-top))}
+.sheet-head .hd{flex:1;min-width:0;padding-top:2px}
+.crumb{font-size:var(--fs-xs);color:var(--text-3);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.crumb b{color:var(--primary-text);font-weight:700}
+.sheet-head h3{margin-top:2px;font-size:var(--fs-md);font-weight:700;line-height:1.4;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (min-width:640px){.sheet-head h3{font-size:var(--fs-lg)}}
+.sheet-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.col{padding:var(--s4);display:grid;gap:var(--s4);align-content:start}
+.col-media{padding-bottom:0}
+@media (min-width:1024px){
+  .sheet-body{display:grid;grid-template-columns:minmax(0,1fr) 400px;overflow:hidden}
+  .col{overflow-y:auto;overscroll-behavior:contain;padding:var(--s5)}
+  .col-media{background:var(--surface-2);padding-bottom:var(--s5)}
+  .col-info{border-left:1px solid var(--border)}
+}
+.player{position:relative;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;display:grid;min-height:0}
+@media (min-width:1024px){.player{background:var(--surface)}}
 .player:empty{display:none}
 .player iframe{width:100%;border:0;display:block;background:#fff}
-.player .tweet{min-height:120px;padding:0 8px}
+.player .tweet{min-height:120px;padding:0 var(--s2)}
 .fbbox{display:flex;justify-content:center;background:#000}
 .igbox{padding:0;display:flex;justify-content:center}
 .igbox .instagram-media{margin:0 auto!important;width:100%!important;max-width:540px!important;min-width:0!important;border:0!important;box-shadow:none!important}
 .igbox iframe{max-width:100%}
-.quiet{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
-.quiet .btn{font-size:14px;padding:7px 12px}
-#quietBtn[aria-checked="true"]{background:var(--ink);border-color:var(--ink);color:var(--sheet)}
-.quiet small{color:var(--graphite);font-size:12.5px;flex:1 1 200px}
-.quietbox{padding:20px 16px;text-align:center;display:grid;gap:10px;justify-items:center;color:var(--graphite);font-size:14px}
-[hidden]{display:none!important}
-.pctl{display:grid;gap:6px}
-.pbtns{display:flex;gap:8px;flex-wrap:wrap}
-.pbtns .btn{flex:1 1 140px;font-size:14px;padding:8px 10px}
-#sMute[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--sheet)}
-.pctl small{color:var(--graphite);font-size:12.5px;line-height:1.5}
-.player .gone{padding:24px 16px;text-align:center;color:var(--graphite);font-size:14px}
-.watch{display:grid;gap:6px}
-.watch .btn.primary{width:100%;padding:11px 14px;font-size:15px;background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
-.watch small{color:var(--graphite);font-size:13px}
-.blk h4{margin:0 0 6px;font-size:13px;letter-spacing:.04em;color:var(--graphite);font-weight:700}
-.blk .src{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;background:var(--paper);border-left:3px solid var(--rule);padding:8px 10px;border-radius:0 8px 8px 0;margin:0}
-.evidence{font-size:13px;color:var(--graphite)}
+.pl-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s3);min-height:280px;padding:var(--s6);text-align:center;color:var(--text-2);font-size:var(--fs-sm);background:linear-gradient(90deg,var(--surface-2) 0%,var(--surface-3) 50%,var(--surface-2) 100%)}
+.pl-msg,.quietbox{display:grid;justify-items:center;gap:var(--s2);padding:var(--s8) var(--s5);text-align:center}
+.pl-msg .ic,.quietbox .ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface-3);color:var(--text-2)}
+.pl-msg.err .ic{background:var(--danger-soft);color:var(--danger)}
+.pl-msg b,.quietbox b{font-size:var(--fs-md)}
+.pl-msg p,.quietbox p{margin:0;color:var(--text-2);font-size:var(--fs-sm);max-width:42ch}
+.quietbox .btn{margin-top:var(--s2)}
+.pctl{display:grid;gap:var(--s2)}
+.pbtns{display:flex;gap:var(--s2);flex-wrap:wrap}
+.pbtns .btn{flex:1 1 160px}
+.pctl small,.hint{color:var(--text-3);font-size:var(--fs-xs);line-height:1.6}
+.section-title{display:flex;align-items:center;gap:var(--s2);font-size:var(--fs-sm);font-weight:700;color:var(--text);margin-bottom:var(--s2)}
+.section-title .i{color:var(--text-3);width:18px;height:18px}
+.practice{padding:var(--s4);border-radius:var(--r-md);background:var(--primary-soft);border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);display:grid;gap:var(--s2)}
+.practice .section-title{color:var(--primary-text);margin:0}
+.practice .section-title .i{color:var(--primary-text)}
+.practice p{margin:0;font-size:15px;line-height:1.65}
+.practice .crit{font-size:var(--fs-sm);color:var(--text-2);display:flex;gap:6px}
+.practice .crit .i{color:var(--success);width:18px;height:18px;margin-top:2px}
+.note-wrap{display:grid;gap:var(--s2)}
+#note{min-height:120px}
+.note-foot{display:flex;justify-content:space-between;gap:var(--s2);font-size:var(--fs-xs);color:var(--text-3)}
+#noteMsg{font-size:var(--fs-xs);min-height:0;display:flex;align-items:center;gap:4px}
+details.disc{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface)}
+details.disc>summary{list-style:none;display:flex;align-items:center;gap:var(--s2);min-height:44px;padding:0 var(--s4);cursor:pointer;font-size:var(--fs-sm);font-weight:700;border-radius:var(--r-md)}
+details.disc>summary::-webkit-details-marker{display:none}
+details.disc>summary .i{color:var(--text-3)}
+details.disc>summary .chev{margin-left:auto;transition:transform .15s}
+details.disc[open]>summary .chev{transform:rotate(180deg)}
+.disc-body{padding:0 var(--s4) var(--s4);display:grid;gap:var(--s3)}
+.src{white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--fs-sm);background:var(--surface-2);border-radius:var(--r-sm);padding:var(--s3);margin:0;line-height:1.7}
+.evidence{font-size:var(--fs-xs);color:var(--text-3);margin:0}
 .tagline{display:flex;flex-wrap:wrap;gap:6px}
-.tagline span{font-size:12px;border:1px solid var(--rule);border-radius:6px;padding:1px 7px;color:var(--graphite)}
-.practice{border:1.5px dashed var(--blue);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
-.practice h4{color:var(--blue)}
-.practice p{margin:0;font-size:15px}
-.practice .crit{font-size:14px;color:var(--graphite)}
-.status{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.status button{border:1.5px solid var(--rule);background:var(--sheet);border-radius:10px;padding:9px 4px;cursor:pointer;font-size:14px}
-.status button[aria-pressed="true"][data-s="todo"]{border-color:var(--todo);background:var(--paper)}
-.status button[aria-pressed="true"][data-s="doing"]{border-color:var(--doing);background:var(--doing-soft);color:var(--doing);font-weight:700}
-.status button[aria-pressed="true"][data-s="done"]{border-color:var(--done);background:var(--done-soft);color:var(--done);font-weight:700}
-#note{width:100%;min-height:96px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);padding:10px;resize:vertical}
-.nav{display:flex;gap:8px;justify-content:space-between;padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--rule)}
-.nav .btn{flex:1}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media (prefers-reduced-motion:no-preference){.lesson,.btn,.mods button{transition:background .15s,border-color .15s}}
+.nav{display:flex;gap:var(--s2);align-items:center;padding:var(--s3) var(--s3) calc(var(--s3) + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--surface)}
+.nav .seg{flex:1;max-width:420px;margin:0 auto}
+.nav .seg button{padding:0 var(--s2)}
+.nav .seg button[aria-pressed="true"][data-s="doing"]{color:var(--warning)}
+.nav .seg button[aria-pressed="true"][data-s="done"]{color:var(--success)}
+.nav .navbtn .lbl{display:none}
+.nav .navbtn{width:var(--h-ctl);padding:0}
+@media (min-width:640px){.nav{padding-left:var(--s4);padding-right:var(--s4)}.nav .navbtn{width:auto;padding:0 var(--s3)}.nav .navbtn .lbl{display:inline}}
+
+/* Phone: tighter header so lessons show on the first screen */
+@media (max-width:639px){
+  .page-head{padding:var(--s4) 0 var(--s3);gap:var(--s3)}
+  .page-head h1{font-size:var(--fs-lg)}
+  .page-head .sub{display:none}
+  .stats{padding:var(--s3)}
+  .stats .nums{gap:var(--s1) var(--s4)}
+  .stat b{font-size:var(--fs-md)}
+  .stat.total{display:none}
+  .unit-head{padding:var(--s3) var(--s4)}
+  .unit-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tb-row .seg{flex-basis:100%;max-width:none;order:2}
+  .count{order:1}
+}
+/* Touch: larger targets */
+@media (pointer:coarse){
+  .chip,.pill{min-height:var(--h-ctl)}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <h1>繪圖靈感<span class="pencil">課程庫</span></h1>
-    <p class="lede">整理自留己看「繪圖靈感」資料夾的 266 則收藏，依原本的 13 個分類編成單元。點一堂課就能在頁面裡看原始影片或貼文，跟著練習並記錄進度。影片從 Instagram、Threads、Facebook、X 即時載入，需要網路。</p>
-    <div class="progress" aria-live="polite">
-      <div class="nums" id="nums"></div>
-      <div class="bar" aria-hidden="true"><i class="b-done" id="barDone"></i><i class="b-doing" id="barDoing"></i></div>
-    </div>
-    <div class="quiet">
-      <button class="btn" type="button" id="quietBtn" role="switch" aria-checked="false"></button>
-      <small id="quietNote"></small>
-    </div>
-  </header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-bell-off" viewBox="0 0 24 24"><path d="M8.7 3A6 6 0 0 1 18 8c0 2.7.4 4.6 1 6"/><path d="M17 17H3s3-2 3-9c0-.8.1-1.5.4-2.2"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M10 13h4"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+  <symbol id="i-vol-x" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2-10 5 10 5 10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><path d="M7 7h.01"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5H3v7h4c0 3.5-1.5 5-4 5zM14 21c3 0 7-1 7-8V5h-7v7h4c0 3.5-1.5 5-4 5z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="2" y="5" width="14" height="14" rx="2"/><path d="m22 8-6 4 6 4z"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="i-p-ig" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+  <symbol id="i-p-fb" viewBox="0 0 24 24"><path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v4H8v7h4v-7h3l.5-4H12V8a1 1 0 0 1 1-1h2z"/></symbol>
+  <symbol id="i-p-x" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4 4 20"/></symbol>
+  <symbol id="i-p-th" viewBox="0 0 24 24"><path d="M17 11.5c-.4-3-2.4-4.5-5-4.5-3 0-5 2.2-5 5s2 5 5 5c2.4 0 4-1.2 4-3.2 0-1.8-1.5-2.8-3.4-2.8-1.7 0-2.9.9-2.9 2.3 0 1.2 1 2 2.3 2 2.4 0 3.4-2.2 3.4-5.3V8.5"/><circle cx="12" cy="12" r="10"/></symbol>
+</svg>
 
-  <div class="tools">
-    <label class="search" for="q">
-      <span aria-hidden="true">⌕</span>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#" id="brand" aria-label="繪圖靈感課程庫，回到頂端"><span class="brand-mark"><svg class="i" aria-hidden="true"><use href="#i-pencil"/></svg></span><span class="brand-name">繪圖靈感課程庫</span></a>
+    <label class="field search" for="q">
+      <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
       <span class="sr">搜尋課程</span>
-      <input id="q" type="search" placeholder="輸入問題，例如：線稿很糊、手怎麼畫" autocomplete="off">
-      <button type="button" id="clearQ" hidden>清除</button>
+      <input id="q" type="search" placeholder="搜尋問題，例如：線稿很糊、手怎麼畫" autocomplete="off" enterkeyhint="search">
+      <button type="button" class="btn btn-ghost btn-icon" id="clearQ" aria-label="清除搜尋" hidden style="min-height:32px;width:32px;margin-right:-6px"><svg class="i i-sm" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <kbd aria-hidden="true">/</kbd>
     </label>
-    <div class="qs" id="qs" aria-label="常見問題"></div>
-    <div class="row2">
-      <div class="seg" role="group" aria-label="學習狀態" id="seg"></div>
-      <span class="count" id="count"></span>
+    <div class="top-actions">
+      <button class="btn btn-ghost btn-icon" type="button" id="quietBtn" role="switch" aria-checked="false" aria-label="安靜模式"></button>
+      <button class="btn btn-ghost btn-icon" type="button" id="recBtn" aria-haspopup="dialog" aria-label="學習紀錄"><svg class="i" aria-hidden="true"><use href="#i-archive"/></svg><span class="lbl">學習紀錄</span></button>
     </div>
-    <div class="mods" id="mods" role="group" aria-label="單元"></div>
   </div>
+</header>
 
-  <main id="list"></main>
+<div class="layout">
+  <aside class="sidebar" aria-label="單元">
+    <div class="side-title">單元</div>
+    <nav class="unit-nav" id="mods" role="group" aria-label="單元"></nav>
+  </aside>
 
-  <footer class="records">
-    <h2>學習紀錄</h2>
-    <p>進度和筆記只存在你現在使用的這個瀏覽器裡，手機和電腦不會自動同步。要搬到別的裝置，先按「複製紀錄」，到另一台裝置打開這個頁面後，貼到下方再按「匯入」。</p>
-    <div class="acts">
-      <button class="btn" type="button" id="exportBtn">複製紀錄</button>
-      <button class="btn" type="button" id="importBtn">匯入</button>
+  <div class="main">
+    <section class="page-head">
+      <div>
+        <h1>繪圖靈感課程庫</h1>
+        <p class="sub">266 則繪圖收藏，依 14 個單元整理。點課程就能在頁面裡看影片、跟著練習、記錄進度。</p>
+      </div>
+      <div class="card stats" aria-live="polite">
+        <div class="nums" id="nums"></div>
+        <div class="bar" aria-hidden="true"><i class="b-done" id="barDone"></i><i class="b-doing" id="barDoing"></i></div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div class="tb-row">
+        <button class="btn" type="button" id="unitBtn" aria-haspopup="dialog"><svg class="i" aria-hidden="true"><use href="#i-layers"/></svg><span class="lbl" id="unitBtnLbl">全部單元</span><svg class="i i-sm" aria-hidden="true"><use href="#i-chev-d"/></svg></button>
+        <div class="seg" role="group" aria-label="學習狀態" id="seg"></div>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="qs-wrap">
+        <span class="k">常見問題</span>
+        <div class="qs" id="qs" role="group" aria-label="常見問題"></div>
+      </div>
+    </div>
+
+    <main id="list"></main>
+
+    <footer class="page-foot">
+      <p>單元順序是建議的學習順序，由這個頁面安排，不是原作者的課綱；每堂課的「練習」也是另外設計的。影片從 Instagram、Threads、Facebook、X 即時載入，需要網路。</p>
+      <p>鍵盤快捷鍵：<kbd>/</kbd> 搜尋　<kbd>←</kbd> <kbd>→</kbd> 上一堂／下一堂　<kbd>Esc</kbd> 關閉</p>
+    </footer>
+  </div>
+</div>
+
+<dialog class="modal sheetlike" id="unitDialog" aria-labelledby="unitDlgTitle">
+  <div class="modal-head"><h2 id="unitDlgTitle">選擇單元</h2><button class="btn btn-ghost btn-icon" type="button" data-close aria-label="關閉"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+  <div class="modal-body" style="padding:var(--s2) var(--s3) var(--s4)"><nav class="unit-nav" id="modsM" aria-label="單元"></nav></div>
+</dialog>
+
+<dialog class="modal" id="recDialog" aria-labelledby="recTitle">
+  <div class="modal-head"><h2 id="recTitle">學習紀錄</h2><button class="btn btn-ghost btn-icon" type="button" data-close aria-label="關閉"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+  <div class="modal-body">
+    <p>進度和筆記只存在你現在使用的這個瀏覽器裡，手機和電腦不會自動同步。要搬到別的裝置：先按「複製紀錄」，到另一台裝置打開這個頁面，把內容貼到下方再按「匯入」。</p>
+    <div class="pbtns">
+      <button class="btn" type="button" id="exportBtn"><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg>複製紀錄</button>
+      <button class="btn btn-primary" type="button" id="importBtn"><svg class="i" aria-hidden="true"><use href="#i-import"/></svg>匯入</button>
     </div>
     <label for="io" class="sr">紀錄內容</label>
-    <textarea id="io" placeholder="貼上複製的紀錄後按「匯入」"></textarea>
-    <div class="msg" id="msg" role="status"></div>
-    <p>單元順序是建議的學習順序，由這個頁面安排，不是原作者的課綱。每堂課的「練習」也是另外設計的，不是影片或貼文的內容。</p>
-  </footer>
-</div>
+    <textarea class="input" id="io" rows="4" placeholder="貼上複製的紀錄後按「匯入」"></textarea>
+    <p class="msg" id="msg" role="status"></p>
+  </div>
+</dialog>
 
 <div class="scrim" id="scrim"></div>
 <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sTitle">
   <div class="sheet-head">
-    <div>
+    <div class="hd">
       <div class="crumb" id="sCrumb"></div>
       <h3 id="sTitle"></h3>
     </div>
-    <button class="x" type="button" id="sClose" aria-label="關閉課程">✕</button>
+    <button class="btn btn-ghost btn-icon" type="button" id="sClose" aria-label="關閉課程"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
   </div>
   <div class="sheet-body">
-    <div class="player" id="sPlayer"></div>
-    <div class="pctl" id="sCtl" hidden>
-      <div class="pbtns">
-        <button class="btn" type="button" id="sStop">■ 停止播放</button>
-        <button class="btn" type="button" id="sMute" aria-pressed="false" hidden>🔇 Facebook 靜音：關</button>
-      </div>
-      <small id="sCtlNote"></small>
-    </div>
-    <div class="watch">
-      <a class="btn primary" id="sOpen" href="#" target="_blank" rel="noopener noreferrer"></a>
-      <small id="sOpenNote"></small>
-    </div>
-    <div class="blk">
-      <h4>學習狀態</h4>
-      <div class="status" role="group" aria-label="學習狀態" id="sStatus">
-        <button type="button" data-s="todo">待學習</button>
-        <button type="button" data-s="doing">練習中</button>
-        <button type="button" data-s="done">已完成</button>
+    <div class="col col-media">
+      <div class="player" id="sPlayer"></div>
+      <div class="pctl" id="sCtl" hidden>
+        <div class="pbtns">
+          <button class="btn" type="button" id="sStop"></button>
+          <button class="btn" type="button" id="sMute" aria-pressed="false" hidden></button>
+        </div>
+        <small id="sCtlNote"></small>
       </div>
     </div>
-    <div class="practice">
-      <h4>練習（另外設計）</h4>
-      <p id="sEx"></p>
-      <p class="crit" id="sCrit"></p>
-    </div>
-    <div class="blk">
-      <h4>收藏原文</h4>
-      <p class="src" id="sSrc"></p>
-      <p class="evidence" id="sEvidence"></p>
-    </div>
-    <div class="blk">
-      <h4>搜尋標籤</h4>
-      <div class="tagline" id="sTags"></div>
-    </div>
-    <div class="blk">
-      <label for="note"><h4>我的筆記</h4></label>
-      <textarea id="note" placeholder="看完寫下重點、卡住的地方或下次要試的事"></textarea>
-      <div class="msg" id="noteMsg" role="status"></div>
+    <div class="col col-info">
+      <div class="watch">
+        <a class="btn btn-block" id="sOpen" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <p class="hint" id="sOpenNote" style="margin:6px 0 0"></p>
+      </div>
+      <div class="practice">
+        <h4 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-target"/></svg>練習（另外設計）</h4>
+        <p id="sEx"></p>
+        <p class="crit"><svg class="i" aria-hidden="true"><use href="#i-check-c"/></svg><span id="sCrit"></span></p>
+      </div>
+      <div class="note-wrap">
+        <label for="note" class="section-title" style="margin:0"><svg class="i" aria-hidden="true"><use href="#i-note"/></svg>我的筆記</label>
+        <textarea class="input" id="note" placeholder="看完寫下重點、卡住的地方或下次要試的事"></textarea>
+        <div class="note-foot"><span>自動儲存在這個瀏覽器</span><span class="msg" id="noteMsg" role="status"></span></div>
+      </div>
+      <details class="disc">
+        <summary><svg class="i" aria-hidden="true"><use href="#i-quote"/></svg>收藏原文<svg class="i i-sm chev" aria-hidden="true"><use href="#i-chev-d"/></svg></summary>
+        <div class="disc-body"><p class="src" id="sSrc"></p><p class="evidence" id="sEvidence"></p></div>
+      </details>
+      <details class="disc">
+        <summary><svg class="i" aria-hidden="true"><use href="#i-tag"/></svg>搜尋標籤<svg class="i i-sm chev" aria-hidden="true"><use href="#i-chev-d"/></svg></summary>
+        <div class="disc-body"><div class="tagline" id="sTags"></div></div>
+      </details>
     </div>
   </div>
   <div class="nav">
-    <button class="btn" type="button" id="sPrev">← 上一堂</button>
-    <button class="btn" type="button" id="sNext">下一堂 →</button>
+    <button class="btn navbtn" type="button" id="sPrev" aria-label="上一堂"><svg class="i" aria-hidden="true"><use href="#i-chev-l"/></svg><span class="lbl">上一堂</span></button>
+    <div class="seg" role="group" aria-label="學習狀態" id="sStatus">
+      <button type="button" data-s="todo">待學習</button>
+      <button type="button" data-s="doing">練習中</button>
+      <button type="button" data-s="done">已完成</button>
+    </div>
+    <button class="btn navbtn" type="button" id="sNext" aria-label="下一堂"><span class="lbl">下一堂</span><svg class="i" aria-hidden="true"><use href="#i-chev-r"/></svg></button>
   </div>
 </section>
 
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
 <script>
-const RAW = /*__DATA__*/[["cmtwva48e7lsl","https://www.threads.com/@ping_ping_bear/post/DdDaEr8ibY9","","(無內文)"],["cmw2ecxp36cuv","https://threads.com/@_xxiva_/post/DfTaetHEl3-","光影","【繪畫筆記】 最近發現打開3D素材網站中的Matcap來速寫3D模型 對快速理解複雜物件的結構真的超方便的耶... 直接把正面對你的面一口氣整理成高光區塊 超好閱讀的～ 小小的新發現～☺️ *據說最早是ZBrush的開發團隊設計來讓創作者快速檢視模型的功能 那拿來速寫看結構真的變"],["cmvven25c7icq","https://www.instagram.com/reel/De9AGUlxz1F/","繪圖技巧","Procreate畫布尺寸到底建多大？"],["cmvvdvca3b09s","https://www.instagram.com/reel/De_qValxNT3/","光影","procreate如何畫光感？"],["cmvtxdawy8rd5","https://www.instagram.com/reel/DfEzH6oRCcZ/","繪圖技巧","這才是Procreate塗抹筆刷到的正確用法！"],["cmufdbrpb1ta7","https://threads.com/@mr.sci_science_tw/post/DdkcAKtkzz7","真實物件參考","(無內文)"],["cmu7uuhtajqmc","https://www.instagram.com/reel/DbKduBAAz8s/","繪圖技巧",""],["cmu7uuhs7n2yl","https://www.instagram.com/reel/Da2GWlQx0Ty/","繪圖技巧","《重新排序網格》的功能回來啦！ 我又可以想發就發，不糾結版面不好看了🤣 最近姓名貼的訂單咻咻咻的來 大家都想在開學前收到齁～～ 在排版製作的過程，突然覺得這個小撇步 也許有繪友很需要♥ 來拍一個吧！ 希望對各位創業之路，少踢一個小石頭😍 我們一起加油👏"],["cmu473bzl16im","https://www.facebook.com/reel/1058760370201744/","構圖","繪畫基礎常識"],["cmu3ftns50pyp","https://threads.com/@moss_0924/post/DdSrWgpkwKx","眼睛","逛素材的時候找到了這個酷東西"],["cmtz8t80e4ugn","https://www.instagram.com/reel/Db5U2RjSrwn/","繪圖技巧",""],["cmtz8t7wr3xqg","https://www.instagram.com/reel/DYwbDK7PQ0l/","繪圖技巧","線稿太糊怎麼辦"],["cmtz8t7o3ah9w","https://www.instagram.com/reel/Db0_k-xqlPo/","Procreate筆刷","(無內文)","gone"],["cmtwva4o5f3i6","https://www.instagram.com/reel/DbkM2XvxKhR/","Procreate筆刷",""],["cmtrx5gqofhoj","https://www.threads.com/@kurenaiaoy/post/Dc-Hn3wmjmj","骨架、動作","這個是人類全身的，也可以選男女"],["cmtrx5gnecyr1","https://www.instagram.com/reel/Db73XMJSf_w/","繪圖技巧","為什麼別人上色怎麼也塗不出去"],["cmtrx5glcigc6","https://www.threads.com/@nazaya119/post/Dc5bbrao4wd","Procreate筆刷","procreate筆刷 （不知道什麼類應該算萬能？） 萬能筆刷類：總之都能用 （置頂雲端可取） 補充說明：1鋪色好用（！"],["cmtrx5gk1v9my","https://www.threads.com/@_xxiva_/post/Dc4n8vrEmV4","速寫","喔喔喔！這個一定要幫忙高調！ 這位神速作畫的漫畫家南儀Yora老師，在文中最後強調畫圖如果要快 最推薦的就是平時多練Gesture Drawing(趨勢速寫/動態速寫)！！！ ♥♥♥這個完全就是阿瓦瓦的繪畫信仰耶～✨ 真心不騙，每天練習20分鐘的Gesture Drawing 繪"],["cmtrx5gfj1b35","https://www.threads.com/@krenzcushart/post/Dc1NbODEnbh","光影","多年前的一張習作,海巡時看到有同學在臨摹,整理了一下當時的過程放上來 大致是 線稿-> 掐通常比較暗的朝下的面和閉塞死角-> 壓暗整個環境,提亮天空-> 加上在暗部環境中的牆面燈籠階梯的固有色-> 摳出建築物被直射光照到的範圍> 補上暗部中朝上的面被天光藍的影響-> 加上直射光照"],["cmtrx5gckgvus","https://instagram.com/p/DcyglwDDZHe","背景參考","How to draw a Water Ripples by @nelvin_cs ⠀"],["cmtjqs16m07mz","https://www.threads.com/@ucookna/post/C-Jwaq4T3Mt","Procreate筆刷","Hi 我是Una✨ 我做了20支排版筆刷想與大家免費分享！ 希望這套筆刷能為大家帶來很多靈感🧚‍♀️ 領取方式我放在留言區哦～"],["cmtf89uxtxg0x","https://www.threads.com/@meroz.art/post/DcnncWsmneh","繪圖技巧","影片1: 距離讓OC寶寶動起來，又更進一步⋯⋯CSP原來有這種功能 （原本一直以為這是AE才有的🤡） - 影片2:工作時都在內心跟雞排講話。 賺了💰下班才有餘力畫二次元"],["cmtdtmbrek3ob","https://www.instagram.com/reel/Db2uoGphMhL/","繪圖技巧","快收藏這個影片吧"],["cmtcbvu2pbh4f","https://x.com/hallo_artwork/status/2092649337990136242","骨架、動作",""],["cmt8ey2dd5v99","https://instagram.com/p/DcGnLD4lDl4","骨架、動作","【フカンで推しの全身が描きたい】 フカンって、全身も描きつつ 顔を大きく描けるので 表情もしっかり描ける めちゃくちゃ便利な構図！🔥 ただ、個人的になんだけど アオリよりも 「角度がついている感」を出しにくい。 フカンっぽく描きたかったのに 超絶短足な推しが爆誕しただけ ってこ"],["cmt8ey2baarku","https://instagram.com/p/DbmVXsuAdBl","骨架、動作","Baca selengkapnya... Dalam menggambar figure dari samping kita akan dihadapkan pada pose torso karakter yang dinamis. Untuk menggambar pose "],["cmt5mfl1ptsuy","https://www.facebook.com/100092681797195/videos/1051347347895611/","光影","用顏色減淡圖層畫光不通透？少了這一步"],["cmt5mfk85r3bw","https://instagram.com/p/DcIxjhzCJ2J","速寫","最近社群上速寫團練陸續看到大家速寫練習，同時很多小畫家也跟我們反應：「雖然一直有在畫，但好像都在憑直覺，好像沒有進步...」 其實，速寫是有更好的方法可循的! 學院特別為大家整理了 K大的「人物速寫 4 大核心技能」： ① 抓趨勢 ➔ ② 圖形歸納 ➔ ③ 結構與體積 ➔ ④ 表"],["cmt3lw4w1jd7l","https://www.instagram.com/reel/DcPeq8tSVvM/","骨架、動作","How to Draw Crossed Legs Easily! | Seated Pose Anatomy & Foreshortening 📌 Original Video Link: 【 🎨 Artist: 画画的不二 Translated from a Xiaohon"],["cmt3lw4tegjxh","https://threads.com/@nazaya119/post/DcPz34aoxGB","Procreate筆刷","procreate筆刷 質感筆刷類：蠟筆 （置頂雲端可取） 原文指路： 作者："],["cmt13e978lwle","https://www.facebook.com/reel/4498765033713798/","風格","繪畫基礎常識"],["cmt13e96laxxx","https://www.facebook.com/reel/1225458093011124/","眼睛","最全的眼睛高光畫法答疑"],["cmt13e95ou6ps","https://www.facebook.com/reel/1017713271057708/","繪圖技巧","繪畫基礎常識"],["cmt13e93luhub","https://www.threads.com/@_xxiva_/post/DcKri1QkiDl","構圖","一點關於透視與視覺引導的筆記✍️ 之前關於視線阻擋的部分好像太缺乏解釋 來補足一下～✨ P.S: 其實未必是一定要把視線擋住或反彈 依據目的像是如果是在一個剪輯很快速的動作場次中 其實引導都擋住反而讓人視線過度徘徊 失去畫面的單純明快印象"],["cmt13e921v69y","https://x.com/8___0c/status/2089726209982861607","骨架、動作","(無內文)"],["cmt13e91ryusn","https://x.com/palmie_oekaki/status/2089912745307332732","骨架、動作","「身体の流れ」があるとキャラが魅力的になります✨"],["cmt13e90v0nbg","https://www.threads.com/@palmie_oekaki/post/DcNLyBkmpZR","骨架、動作","指を指すポーズの描き方👈"],["cmt13e8zuqtqm","https://x.com/hatsudayoooo/status/2089314639494688870","骨架、動作","頭部の描き方で、上向下向きが一番描くのが厄介かと思うんですが 自分の描き方のコツとしては「耳の付け根」と「顔の三角形」をつなぐ意識で補助線を引くと いい感じに立体に感じる手助けになってくれます。 ご査収ください。"],["cmszb2s87tf8d","https://www.instagram.com/reel/DcI48PHPkEL/","骨架、動作","How to Draw Legs THAT LOOK GOOD! (Anatomy & Perspective Hack) 📌 Original Video Link: 【 🎨 Artist: 龙二绘画 Translated from a Xiaohongshu (REDno"],["cmszb2s5nkvmw","https://instagram.com/p/DcJAW63vX6f","骨架、動作","가슴과 엉덩이 근육의 세로 길이를 비슷한 비율로 잡아 준다.여성은 가슴보다 엉덩이의 세로 길이를 조금 더 크게 잡아 볼륨을 표현한다."],["cmsxvhvxq9b98","https://x.com/tatami_loop/status/2087933979030917527","骨架、動作","横から見た、左右の膝の高さに関する考察が流れてきたので、昨日のスケッチをもとに考えてみました。 リラックスした立位のポーズでは、奥の右膝が低い位置に見える場合、骨盤も右下がりだと予想できます。よって理屈上はスカートの左縁が上がるはず。この膝とスカートの左右の高さの不一致がきっかけ"],["cmsxvhvx7qnoj","https://x.com/palmie_oekaki/status/2088764176273698922","眼睛","印象的な目の塗り方✨"],["cmsxvhvw8a2l4","https://x.com/sodaguyx/status/2088821650435325965","骨架、動作","male vs female torso"],["cmsxvhvvhaa5a","https://x.com/palmie_oekaki/status/2089126564315435337","光影","光源別 影の練習例☀️"],["cmsxvhvurjv9w","https://x.com/palmie_oekaki/status/2088825583040122994","服裝","制服のリボンの基本の形🎀"],["cmsxvhvu93dzk","https://x.com/palmie_oekaki/status/2088944363363791290","眼睛","立体的な目の構造✍️"],["cmsxvhvtsd0kb","https://x.com/ito_pro_illust/status/2088928756182520243","骨架、動作","腰に当てる手が描けない人へ"],["cmsxvhvtae6kh","https://x.com/limbosketch/status/2088989284044861786","服裝","Folds are simpler than you think"],["cmsxvhvrkrfvj","https://www.instagram.com/reel/DZH8Iv0AAur/","光影","🤧🖤"],["cmsxvhvr2ytms","https://www.instagram.com/reel/Da1z90JR0Rd/","骨架、動作","Is Your Neck Too Straight? | 脖子畫太直了嗎？ 摸摸哩"],["cmsxvhvqcdvd7","https://www.instagram.com/reel/Dbacwlpg43V/","服裝","神秘篼帽畫法"],["cmsxvhvpl9bid","https://www.instagram.com/reel/DZ-VhBmhEOA/","骨架、動作","How to Draw Legs CORRECTLY (In 30 Seconds!) ⚡🦵 光速教會你畫出美腿！ 這是來自REDnote藝術家的教程 Id@畫嚒嚒"],["cmsxvhvp4uz09","https://www.instagram.com/reel/Dafb0PGzYNI/","骨架、動作","a_designer_my 於 July 7, 2026 : \"臀畫好了，腿不會加怎麼辦？"],["cmsxvhvmxd547","https://www.threads.com/@zudarts_lee/post/DcGNrYYjr3w","背景參考","分享場景般的作業點評精華 其實畫畫不只要感性，不只要爽，也需要理論來支撐 第三周作業點評 話雖如此，但有時候也會擔心塞太多知識理論，怕資訊太多XD"],["cmsxvhvlxi7wp","https://www.threads.com/@ito_pro_illust/post/DcFUj5FAZfI","光影","顔のライティングが分からない人へ"],["cmsxvhvl7ufkz","https://x.com/comixsenpai2005/status/2088655438279586067","骨架、動作","I love heads, I love em so much."],["cmsxvhvkqh39u","https://x.com/palmie_oekaki/status/2088552783675068857","骨架、動作","振り向きポーズのポイント💡"],["cmsxvhvk9zr6l","https://x.com/ezdrawps/status/2088297293367706036","骨架、動作","Head angulation can be difficult"],["cmsxvhvjjl0j1","https://x.com/lumicanvass/status/2088400475909505274","背景參考","Trees get easier when you stop drawing every leaf 🌿"],["cmsxvhvizt9iv","https://x.com/nana__ogw/status/2088607698908844508","速寫","30sec"],["cmsxvhvifvhy4","https://x.com/ref_pics/status/2088319121372909703","光影",""],["cmsxvhvhpjkgr","https://x.com/limbosketch/status/2088214439434543548","眼睛","Eyelashes flow"],["cmsxvhvggmtya","https://x.com/tatami_loop/status/2088594700580348027","骨架、動作","肘の内側上顆(再掲) 内側の骨を意識すると、肘が少しだけリアルになります。描き込みが濃いとゴツゴツするので、陰影で軽く表現する程度がおすすめです。"],["cmsu1q0m0pbkg","https://instagram.com/p/Db-50kSDXhs","服裝","by @muzenik_tutorials ⠀"],["cmsu1q0kpykrq","https://www.threads.com/@pink.linhh/post/Db-J8hxFAHO","真實物件參考","summer ☀️☀️☀️"],["cmstk536rfxac","https://www.threads.com/@jioa_huang/post/DbhZnfSCII2","骨架、動作","(無內文)"],["cmst3bgdxry90","https://www.threads.com/@mon_511312/post/DcAxlxIE45e","光影","我之前做了一個簡化上色的技巧 可以參考看看！希望能幫上你⭐"],["cmst11phhiq45","https://www.threads.com/@student_lai_photo/post/Db99AMck9YK","背景參考","我拍下了我眼中不一樣的「雲林」。"],["cmssbtcubs1c6","https://www.instagram.com/reel/Db4tapeRS8y/","骨架、動作","What’s Different? | Male vs Female Body Proportions 男女畫法差異"],["cmssbtcs85zcv","https://www.instagram.com/reel/DbxPifGhN3G/","骨架、動作","How to Master 3/4 View Head Perspective (Simple Spherical Grid) 📌 Original Video Link: 【 :2pm teb:/ 11/24 C@h.oq 】 🎨 Artist: 画画的草履虫金木木 Tra"],["cmsrkpo4sm4gy","https://x.com/chalian1005/status/2087779590316138960","骨架、動作","(無內文)"],["cmsrk9g04j126","https://www.threads.com/@paolinadual506/post/Db-buXIjadc","Procreate筆刷","今天畫畫真是太不小心了"],["cmsrgkiozdqb5","https://www.instagram.com/reel/Db92lGvNeOV/","骨架、動作","Pecho femenino✍️✨"],["cmsrgkinthqzl","https://x.com/tatami_loop/status/2087596073158390218","骨架、動作","写真資料を使った背面スケッチ 身体に等高ラインを示したポーズ集。各部の傾きや奥行き方向のボリューム、骨のランドマークを観察する練習にかなり便利です。 あとぴっちりタイツが簡単に描けるメリットがあります。これならセンシティブ判定を回避しやすいはず… 参考写真の提供：@grafit_"],["cmsrgkinbp157","https://x.com/mrsghoststudio/status/2087630702330221040","眼睛","Anime eye inking process 👁️✨"],["cmsrgkimr35ac","https://x.com/mrsghoststudio/status/2087652042080669899","構圖","Head and shoulder angles ✍️📐"],["cmsr3fhp90zcs","https://www.instagram.com/reel/DZU0ypLAwFm/","骨架、動作","😊♥️"],["cmsr2xzx9ymwa","https://instagram.com/p/DbZcUh4E9p0","骨架、動作","個人メモ：胴体・性別のシルエット ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️胴体の研究①・胴体『前面』の骨と筋肉解説 FANBOX Patreon ■ENGLISH Structure of the Tors"],["cmsr2xzw4bmp0","https://www.facebook.com/reel/1670865104004143/","骨架、動作","tips nhanh lưu lẹ"],["cmsr2xzvmrvgn","https://instagram.com/p/DasXXYyFHp-","骨架、動作","個人メモ：胴体の自然な伸展可動 ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️胴体の可動『屈曲・伸展』解説 FANBOX Patreon ■ENGLISH Movement of the Torso : Flex"],["cmsqapzt2jcjg","https://instagram.com/p/DbAIKp3jwpV","骨架、動作","個人メモ：腕組みポーズ ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️腕の複合可動②：基本解説 FANBOX Patreon ■ENGLISH Combined Movement of the Arm FANBO"],["cmsq5rzak65rm","https://www.facebook.com/100092681797195/videos/2104991010390688/","繪圖技巧","繪畫基礎常識"],["cmsq5rz96zx6r","https://x.com/vulpe922/status/2087445035143123393","骨架、動作","ｾﾝｼなっちゃったので再掲"],["cmsq5rz8dd8z2","https://x.com/mrsghoststudio/status/2087320238794658114","骨架、動作","Hand anatomy explained ✍️✋"],["cmsq5rz7m6qg9","https://www.threads.com/@xiko_xx_/post/DbV0P8Eidue","繪圖技巧","每天練習畫畫 練到ㄈ級分之前都不停下來"],["cmsq1zh2jqxjk","https://x.com/limbosketch/status/2087255099898810389","頭髮","Almost every type of bangs for your OC's hairstyle"],["cmsq1zh24xyy0","https://x.com/popycornio/status/2087260632387047566","骨架、動作","Simple sketches need strong foundations. Break the figure into basic shapes and build from there"],["cmsq1zh192qro","https://x.com/ezdrawps/status/2087309283905937513","骨架、動作","See the diference?"],["cmsq1zh08wudc","https://www.threads.com/@paolinadual506/post/Db7lxBXmhB5","眼睛","眼珠子畫法示意"],["cmsq1zgz54pe6","https://www.instagram.com/reel/DaTIfF7I8eY/","光影","Best Procreate Brushes-Brusher in App Store 🖌️ Get all premium tools and daily drawing tips for your art 🖼️ DM me for brush support or col"],["cmsq1zgypr733","https://www.instagram.com/reel/DbX5Hruu_m1/","繪圖技巧","(無內文)","gone"],["cmsq1zgy99cwh","https://instagram.com/p/Db7NykTlIcI","骨架、動作","個人メモ：胸の付き方 肩の基本構造(静止) FANBOX Patreon ■ENGLISH Structure of the shoulder basics FANBOX Patreon ■中文 肩膀的基本结构（固定式） Patreon"],["cmspk6c5qngzr","https://www.threads.com/@t.tea_j/post/Db5_aNoksi1","光影","選色"],["cmspk6c4wc62s","https://instagram.com/p/Db5M_JqNQqA","眼睛","If you are difficult to draw eyes from the side, understand it as a figure. When you look at the side of the anime characters, you can see t"],["cmspk6c2hfxo4","https://www.instagram.com/reel/Da3fvYkt-Pq/","光影","Draw with me in Procreate"],["cmsobw99y4sqn","https://www.instagram.com/reel/DZF4P9XtN0Q/","光影","3000+ Brushes — Brusher in App Store 🖌️ Get all premium tools and daily drawing tips for your art 🎥 💜 🚨 DM me for brush support or colla"],["cmso056qvf53m","https://www.instagram.com/reel/DbYCCSyzOc3/","繪圖技巧","✨使用克隆工具增加畫面質感✨ 當你的插畫好像少了點質感，就能使用這招！ 輕輕鬆鬆就能增添畫面細節🤩 趕快分享小技巧 給想學畫畫的朋友吧🙌"],["cmso056qemjic","https://www.instagram.com/reel/DZfWoDHsJk3/","骨架、動作","🥀✅❌"],["cmso056pwg16q","https://x.com/depressramiart/status/2086878998437433704","光影","tummy render tutorial ❤️"],["cmsnuy2a685no","https://www.instagram.com/reel/DYWtbNZx3mG/","光影",""],["cmsnuy28y0euz","https://www.instagram.com/reel/DZ21Wy8zK5j/","服裝","How to Draw Folds for 4 Different Fabrics! 🧥✨ 如何畫4種不同面料的衣褶！"],["cmsnuy28jae5h","https://instagram.com/p/Dak-oKZjAtn","骨架、動作","(Pull down for english ) 🇫🇷 - Études d’abricots (les vraies savent). 🇬🇧 - Apricot studies (the real ones know). Drawn on my tablette @xp"],["cmsnuy28480j7","https://www.instagram.com/reel/DZ9RH7fTSfD/","骨架、動作","(無內文)","gone"],["cmsnuy27p57qg","https://www.instagram.com/reel/DbmQgFRi5fO/","骨架、動作",""],["cmsn6h123g747","https://www.facebook.com/reel/2244833489778439/","骨架、動作","Anatomy Hack You NEED to Know"],["cmsn5krajmxxg","https://instagram.com/p/DbdMhFuDwrZ","骨架、動作","안경은 눈의 기울기에 맞춰 배치한다. 안경을 올리거나 내려도 양쪽 렌즈에는 높낮이 차이가 생길 뿐, 렌즈의 기준선은 눈의 기울기와 평행하게 유지한다."],["cmsmr82n065hb","https://instagram.com/p/Dbnc6WWvN8_","骨架、動作","손바닥은 새끼손가락 아래의 볼륨이 손목까지 이어지는 하나의 덩어리 구조를 이룬다. 이 연결감을 표현하면 손의 입체감이 더욱 자연스러워진다."],["cmsmr82mmgpwd","https://instagram.com/p/DbvOILmv-pw","骨架、動作","몸의 회전 각도에 따라 손이 보이는 면도 함께 달라진다. 정면에서는 손 옆면, 반측면에서는 손 반측면, 측면에서는 손등면을 기준으로 표현한다."],["cmsmr82m5fast","https://instagram.com/p/DbKEjGAj4OZ","骨架、動作","個人メモ：横から見た胴体のライン ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️胴体の研究①・胴体『前面』の骨と筋肉解説 FANBOX Patreon ■ENGLISH Structure of the Tors"],["cmsmpyxm8fjmh","https://www.facebook.com/reel/2033130784007400/","光影","四分之三側臉光影結構，畫光影一定要懂結構"],["cmsm0e4n1b6c8","https://www.facebook.com/reel/1316097680674440/","服裝","怎么才能畫好衣褶 衣褶畫法，衣褶筆刷畫起來也快，襯衣畫法"],["cmsm0e4lwgvlm","https://www.facebook.com/100092681797195/posts/952300484536003/","骨架、動作","3/4頭像示范||"],["cmsm0e4lb7a81","https://www.facebook.com/100092681797195/posts/958043950628323/","骨架、動作","手部素材||"],["cmsm0e4kxycvc","https://www.facebook.com/reel/982436421034983/","骨架、動作","繪畫基礎常識作者：NIRO"],["cmsm0e4kiono8","https://www.facebook.com/reel/976664208749966/","繪圖技巧","ipad畫畫到底建多大的尺寸？"],["cmsm0e4jwgpig","https://www.facebook.com/reel/1051234857403947/","速寫","分享一點速寫的經驗 這種剪影起稿對於造型蠻有幫助的 但會建議嘗試前可以先具備良好的線稿結構能力更好"],["cmslonteitpea","https://www.facebook.com/reel/28308616702093927/","骨架、動作","亂畫耳朵的后果，就是毀掉下頜線！"],["cmslontciq417","https://www.facebook.com/photo.php?fbid=122111270445294669&set=a.122099947389294669&type=3","服裝","facebook.com"],["cmsl77kewl6mb","https://instagram.com/p/DafPnMVE-GB","構圖","人體體🥢透視分享"],["cmsl77kehcjat","https://instagram.com/p/Daz0Yg-EzOi","構圖","300+模板「舉手」拿"],["cmsl77ke0zgfn","https://instagram.com/p/DbIZrggkwfH","光影","臭寶，該學畫畫啦！"],["cmsj24ckejfqs","https://www.threads.com/@huiping3939/post/DYYgv1inxZu","背景參考","夏之豔… 💙❤️💛💚 在台南林森路二段(東寧派出所至後甲國中對面成大校區旁)"],["cmsj24ch0svj9","https://www.threads.com/@sydneyyyyyy_s/post/DaimqU4j8pQ","背景參考","颱風前夕看到好多好漂亮的海島景色忍不住想留一串紀錄在這邊"],["cmsj24cfa0m5f","https://www.threads.com/@abao.douliu/post/Da5DD9qj0G2","背景參考","這兩天的斗六是怎～麼～回～事～啦 水嘎啊餒 🌈"],["cmsj0ickq85e8","https://www.facebook.com/reel/890729184106520/","繪圖技巧","繪畫基礎常識"],["cmsj042k5f0rr","https://www.threads.com/@kiasherria/post/Dbmq9zADpWF","光影","整理了一份平常畫圖時，思考色彩的方式 假設你是一直以來，喜歡我的彩圖 且想知道我是如何選色的人 希望這份色彩思考可以幫助你 怎麼去思考、跟判斷配色 內容還有包含標出色盤選色範圍 （連結下收）"],["cmsiyl5q85m63","https://www.threads.com/@luchi.film/post/Dbp66E7kZn0","風格","沒想到把照片轉成 Halftone Screen 效果竟然如此療癒，就像做出自己的海報！"],["cmsirw06r55jd","https://www.threads.com/@gamefornitendo004008/post/DbuCT2EEysX","背景參考","聽過雨蝶 但你看過雨蝶嗎"],["cmsifnad0zrte","https://www.facebook.com/reel/890729184106520/","頭髮","繪畫基礎常識"],["cmsfx4el76w0z","https://www.facebook.com/reel/1035728582186837/","光影","procreate懶人藏色畫出五彩斑斕的白"],["cmsfwwd8kofne","https://www.threads.com/@sakakibara0_0/post/Dbn6M-riRYI","繪圖技巧",""],["cmsfnbe4gjvvv","https://www.facebook.com/100002498930298/posts/23931117869888176/","骨架、動作","分享剛剛找到的好棒動作參考網站👀 可以自己調整人偶姿勢，再讓網站自己幫你尋找動作相近的參考圖 比之前自己在Pinterest查關鍵字狂找參考圖省時滿多的 不過人偶可動性沒有到很高，可能還是會有一些姿勢擺不出來 滑鼠左鍵點關節球拖曳：變更動作 滑鼠滾輪按住拖曳：調整視角 滑鼠右鍵"],["cmsewnocn3oyc","https://www.threads.com/@moose.8763188/post/DbmvrMFAmv8","背景參考","昨日長岡で見た太陽が浮世絵だった。"],["cmtcqph2hs8i8","https://www.threads.com/@wal_aabb/post/DcilRUsiQp3","","我有一劍，名曰晚霞"],["cmsxvhvq3xzt2","https://www.threads.com/@lambliver0420/post/DcG2vKuGFlm","","這是一套給繪師／創作者使用的個人作品網站模板。 網站包含作品集、委託案例、委託資訊、個人介紹與 SNS 等頁面，作品與網站內容也可以透過 Notion 自行更新，不需要每次修改都碰程式碼。 整體以作品展示為主，希望讓創作者可以有一個簡單、完整，也方便長期維護的個人網站。 Demo"],["cmw0vnz870bk7","https://www.threads.com/@mimitsoi_hk/post/DfRWCbMmtKO","光影","最近用AI開發新工具，做了一個調色器，可模擬光影配色，也可匯出色票供Clipstudio及Procreate使用"],["cmvve6w9piyu3","https://www.instagram.com/reel/DZ7H8ojvVSc/","光影","繪畫小技巧"],["cmvtxnd3mxjor","https://www.instagram.com/reel/DewHSozx9s7/","背景參考","procreate背景糊弄大法！"],["cmuz2yr8qoyc6","https://www.threads.com/@skrt1023_/post/DeM7efuHfMF","速寫","突然想到大二的暑假作業還沒發 那時候要畫70張的樣子 全部擠在開學前狂畫 重點是根本沒去那些地方 全部都是以前手機的照片"],["cmufdbrmihzjx","https://www.facebook.com/reel/3749790505172654/","骨架、動作","胯部連接始終理解不了？三分鐘教會你 零基礎適用"],["cmu7uuhtul39a","https://www.instagram.com/reel/DdbpwVJTSAu/","眼睛","為什麼你的眼神不對焦？ 【画久久的作品】"],["cmu7uuhsqrkk6","https://www.instagram.com/reel/Db5SrpDPTph/","繪圖技巧","畫畫小技巧"],["cmu6edvyfzzuy","https://www.instagram.com/reel/DbIHS2IPfb0/","繪圖技巧","提取線稿邪修教程"],["cmu0k1x093c93","https://www.threads.com/@nazaya119/post/DdN_ilvo6n0","Procreate筆刷","procreate 筆刷 特殊筆刷類：為人方正 （置頂雲端可取） 補充說明：無"],["cmtz8t7x9drdu","https://www.instagram.com/reel/DcwzcBvzbqo/","繪圖技巧","Drawing fundamentals edition 📦 📦"],["cmtz8t7p2mc4d","https://www.instagram.com/reel/DZuMGEYP29Y/","Procreate筆刷","(無內文)"],["cmtz8t7nlvc14","https://www.instagram.com/reel/Dbm1GPfJkSi/","Procreate筆刷","(無內文)"],["cmttpp57f7vih","https://www.threads.com/@honghongxw/post/DdCMlCkj45D","Procreate筆刷",""],["cmtrx5gop5pz6","https://threads.com/@nuomi0213/post/Dc7-jiUI0Xc","Procreate筆刷","筆刷大師Kyle T. Webster 教大家如何在 Procreate 建立筆刷！ 筆刷系統大概是Procreate最迷人也最複雜的一塊 Kyle T.透過內建筆刷教大家如何建立新的筆刷 從中我們可以看到每個筆刷的參數是如何影響筆刷的變化 長達一個多小時的”免費課程“ 非常值得"],["cmtrx5gm0hbfn","https://www.instagram.com/reel/DcgoltmygTR/","繪圖技巧","最後一招太實用了😳 這樣就不用一直切來切去了 40秒把所有procreate的 基本操作都搞懂！！！ 還不趕快追蹤分享起來！"],["cmtrx5gl06y2i","https://threads.com/@nazaya119/post/Dc5dU0Po5yE","Procreate筆刷","procreate 筆刷 質感類：想來點質感嗎？ （置頂雲端可取） 補充說明：無"],["cmtrx5giqmppe","https://www.threads.com/@cmt_6_04st/post/Dc3Ig81E4yC","Procreate筆刷","(無內文)"],["cmtrx5gf7vh99","https://www.threads.com/@krenzcushart/post/Dc1NbODEnbh","背景參考","多年前的一張習作,海巡時看到有同學在臨摹,整理了一下當時的過程放上來 大致是 線稿-> 掐通常比較暗的朝下的面和閉塞死角-> 壓暗整個環境,提亮天空-> 加上在暗部環境中的牆面燈籠階梯的固有色-> 摳出建築物被直射光照到的範圍> 補上暗部中朝上的面被天光藍的影響-> 加上直射光照"],["cmtrx5gas4vr0","https://www.threads.com/@meilinlin_0/post/Dcx0-QIkw3S","光影","🎨繪畫技巧與流程分享 最近畫了兩張自己小說的角色，總結了一些Procreate畫人物時的流程跟習慣，分享給需要的人～～但都是很基礎的東西🤣 【流程】 P1 1）我習慣先畫黑白稿，確認素描關係，這個環節佔據80%時間，畫完這個後續就會很快了。 2）拿黑白稿上漸層對應/梯度映射，"],["cmtiluil6dhkb","https://www.facebook.com/reel/949995314037806/","Procreate筆刷","夏日窗臺 夏天藏在窗里，云在慢慢流浪??"],["cmtf89ux88ng7","https://www.threads.com/@krenzartwork/post/Dcn3rCzmx8W","骨架、動作","可以先把人體簡化成幾個幾何體，像胸腔、骨盆、手腳先當成方塊或圓柱，先理解它們怎麼轉、怎麼接，通常會輕鬆很多。 另一種方法則是先抓外輪廓跟大形，先把人物整體形狀畫準，再慢慢往裡面補結構跟細節。 簡單來說，一個偏\"從裡面理解體塊\"，一個偏\"從輪廓抓形狀\"。兩種都可以練，看哪一種比較適"],["cmtdtmbs0utsa","https://www.instagram.com/reel/Db6xa0OBMuJ/","構圖","【 攝影小技巧 - 用前景做加法 】 想讓單調的畫面變得比較豐富 我們可以試著幫畫面做加法 幫主體增加一些相關元素進去 這樣就可以拍到比較有層次的畫面喔！ 想學習更多攝影技巧和思維 歡迎追蹤我一起進步👋🏻"],["cmtcbvu2zwudl","https://www.threads.com/@wise_not_wise732/post/DciGgHpEtma","Procreate筆刷",""],["cmtcbvtwqp0a4","https://www.threads.com/@seki_ichi0909/post/DcdEuH4k_vb","頭髮","草稿>分前後色塊上色>噴漸層底色>用更多色塊跟碎面疊出頭髮（一種疊疊樂⋯⋯）"],["cmt8ey2bv4mjb","https://www.instagram.com/reel/Db5RlJkz2gI/","骨架、動作",""],["cmt8ey2aul7kx","https://instagram.com/p/DbdAWjqk2_X","骨架、動作","大腿結構！"],["cmt5mfkcvstmr","https://www.instagram.com/reel/DbVOyMyPmiC/","頭髮","動感頭髮怎麼畫"],["cmt3px2fywomm","https://www.instagram.com/reel/DcUpaJEBO7z/","骨架、動作","How to Construct & Add Muscle Anatomy to Rough Sketches! | Drawover Tutorial 📌 Original Video Link: 【 🎨 Artist: 龙二绘画 Translated from a Xia"],["cmt3lw4uf0uzl","https://www.threads.com/@su_huangpin/post/DcOSY1siaTx","真實物件參考","特富野古道的光線真的太多變化 能夠走在森林裡真的太幸福了！"],["cmt13e997ucgo","https://x.com/palmie_oekaki/status/2090002335041012132","眼睛","かわいい・キレイ系の目の描き方👀"],["cmt13e96x7jlb","https://instagram.com/p/DcOcmwPCVwg","骨架、動作","簡單標註了畫腋下時需要注意的身體構造 可以看到肌肉到完稿 變化還是很大的 因為還要考慮皮下脂肪的分佈 關於這些結構的細節 我會再貼文詳解 咖啡因的第一本教學書 《從零開始的日系角色入門》 開賣啦！ 實體書： 電子書："],["cmt13e95etaod","https://instagram.com/p/DcN5i0Jk09F","骨架、動作","臀部畫畫分解！（有課程提供大家學習哦）"],["cmt13e93aa7io","https://www.threads.com/@allen88228/post/DcLXWG1gYVO","真實物件參考","在海拔𝟳𝟬𝟬多公尺的山裡喝咖啡 ⟣ 位於三峽 の 山林秘境， 存了好幾年才終於到訪，這美景真的愛了 🫪"],["cmt13e9158v2q","https://www.threads.com/@_xxiva_/post/DcNFa1jEpXB","構圖","哈囉，如果是場景與構圖相關書籍的話 爆推這兩本吉田誠治老師的書喔：(超級精彩又好懂易消化) 「吉田誠治作品集&掌握透視技巧」(北星出版 IG: @ nsbooks_official ) 「TIPS！吉田誠治插畫描繪技巧提升教學手冊」(尖端出版 @sppbooks ) 構圖速寫練習"],["cmt13e90ktcye","https://www.threads.com/@zhimeow_222/post/DcJQ9RrAcId","繪圖技巧",""],["cmt13e906ajqu","https://x.com/kcreed11/status/2089598259492999582","骨架、動作","많이 그리게 되는 골반을 뒤로 빼는 동세! 를 그릴 때는 확실하게 골반이 뒤로 가는 등고선을 만들어 줘야 이쁜 허리 라인을 만들 수 있어요~!"],["cmt13e8zize9n","https://x.com/designatmo/status/2089659842449244321","眼睛","The final highlights are what turn a flat eye into glass"],["cmszb2s60c3sv","https://instagram.com/p/DcLXu9hvrkz","眼睛","게슴츠레한 눈을 표현할 때는 얼굴 각도에 맞춰 기본 눈의 세로폭을 절반 정도로 줄여 그린다."],["cmszb2s57b5u5","https://instagram.com/p/DcJ5xlgk4NS","服裝","PERSONAL NOTE: Tips for Drawing Dress Shirts: Cuffs & Collars ❇️Available on Patreon❇️ ✴️check out the direct link in bio!✴️ ⬇️or copy this "],["cmsxvhvxhnpsw","https://x.com/tatami_loop/status/2089239275661574429","骨架、動作","女性の脚のシルエット（再掲） 膝や足首の内外の凹凸の関係を知っていると、脚の違和感を軽減できると思います。"],["cmsxvhvwqs3ft","https://x.com/limbosketch/status/2089164829487493596","服裝","Sweater!"],["cmsxvhvvq9uvf","https://x.com/limbosketch/status/2089027354421043368","頭髮","For your girl OC"],["cmsxvhvv00tsa","https://x.com/limbosketch/status/2089027140075376990","骨架、動作","Don't forget the trapezium!"],["cmsxvhvuijm1i","https://x.com/deskmatis/status/2089060193262764435","骨架、動作","Great tip! Never forget it!"],["cmsxvhvu1sie0","https://x.com/limbosketch/status/2089094946498269482","骨架、動作","Nice perspective exercise you should try"],["cmsxvhvtiipak","https://x.com/ganet_p/status/2088949416392794452","光影","두상 명부,암부 곡선 방향 헷갈리는 분들 팁. 구 형태 도형에 1차명암으로 폼쉐도우를 넣어 보면 이해하기 쉽습니다. 예시로 초승달-보름달-그믐달의 순서로 모양을 생각해 볼 수 있습니다."],["cmsxvhvt155mp","https://x.com/kokuren_1/status/2089038430231826712","骨架、動作","16"],["cmsxvhvrcwk8n","https://www.instagram.com/reel/DaDcBWfTGvm/","服裝","4 Master Formulas for Drawing Fabric Folds 4個公式帶你輕鬆搞定所有衣服褶皺。 衣服褶皺的乾貨教學教程！ 來自REDnote藝術家的教程 Id：357341230"],["cmsxvhvqt6qcm","https://www.instagram.com/reel/DbvBlyPTbC9/","骨架、動作","(無內文)","gone"],["cmsxvhvpvwzgw","https://www.instagram.com/reel/DZupLsGzhgw/","服裝","6種不同類型褶皺的繪製教程"],["cmsxvhvpdbe2l","https://www.instagram.com/reel/Da2Y65FhtEU/","背景參考","This is a small sketch demonstration and explanation from one of my classes."],["cmsxvhvon3xj5","https://www.instagram.com/reel/DcDIOmntA9q/","骨架、動作","Pecho femenino✍️✨"],["cmsxvhvmogso5","https://www.threads.com/@moriiiii_ice/post/DcFdt-BCacC","服裝","スカート📝"],["cmsxvhvm74yho","https://www.threads.com/share/_lnCo4MMq/","真實物件參考","(無內文)","gone"],["cmsxvhvlopp5n","https://www.instagram.com/reel/DZeT-ufC9Jt/","骨架、動作","Head drawing tutorial by artist Ryuji's (龙二绘画) — a clear and structured approach to building the head using simple construction lines, propo"],["cmsxvhvkzgsbr","https://x.com/spdr_p/status/2088066111128674319","繪圖技巧",""],["cmsxvhvkho674","https://x.com/uo_3987/status/2088559343524610276","骨架、動作","頭は置くではなく首に刺し込むイメージ"],["cmsxvhvk029uy","https://x.com/limbosketch/status/2088209327907651739","骨架、動作","If you are struggling with kneee try drawing like this"],["cmsxvhvj9ddaw","https://x.com/kokuren_1/status/2088350607472304216","骨架、動作","14"],["cmsxvhvip86o8","https://x.com/formsketch_/status/2088386966807040213","骨架、動作","The shoulder blades really change everything"],["cmsxvhvi35i8o","https://x.com/a_nmanco/status/2088191620135207307","眼睛","メイキング...！！ これとかかも"],["cmsxvhvh9xzg8","https://x.com/chaba251114/status/2088616783234396334","骨架、動作","お練習"],["cmsu1q0mdn95b","https://www.threads.com/@_xxiva_/post/DcC6A4QEp_5","構圖","很多厲害的概念美術在畫草圖時，都是先畫一堆2公分x2公分左右超迷你的黑白小草稿"],["cmsu1q0liunqa","https://instagram.com/p/DblWa1yjCQu","骨架、動作","(pull down for english ⤵️) 🇫🇷 - Arrêtez de dessiner des ballons⚽. La poitrine a une vraie anatomie, une vraie physique, de vraies attaches","gone"],["cmstk537b8z1i","https://www.threads.com/@thootsithootsi/post/DblKkEFGrXy","背景參考","哇這個真的漫畫人的福音😭😭"],["cmst3mi6310zy","https://www.instagram.com/reel/DbSyAMFRvNl/","骨架、動作","How to Draw the Female Chest? | 女性胸部怎麼畫？ 摸摸哩"],["cmst2gsakh933","https://www.instagram.com/reel/DcAgD-9tmu8/","骨架、動作","Pecho femenino✍️✨"],["cmsssm6qipex6","https://www.threads.com/@krenzartwork/post/DcAg2hpkWvM","繪圖技巧","線條本身確實需要花一點時間做控筆練習，不過也可以先區分一下你看到別人的\"穩\"是哪一種。 有些看起來像一筆到位，其實背後可能已經 Ctrl+Z 很多次；也有一些是遠看線條很順，但放大之後其實還是有不少小抖動，這也很正常，很多漫畫家的線稿也是這種狀態。 所以不用把\"完全不抖\"當成標準"],["cmssbtcu38a2f","https://www.instagram.com/reel/Db7KML-MkYI/","骨架、動作","Pecho femenino✍️✨"],["cmsrkpo5o8kjs","https://x.com/desquolor/status/2087602781905432702","骨架、動作","some michael hampton ab studies, looking into torso material to try to get better at it"],["cmsrkpo41jwm5","https://x.com/tatami_loop/status/2087799368422412601","骨架、動作","胸のバージスライン（再掲） 乳房と胸郭の境界線をバージスラインと呼ぶそうです。（おそらくアパレル業界の俗称） 特にアオリのアングルでは「乳房の輪郭」と「バージスライン」を分けて考え、見え方に気をつけて描きたいところ。 不思議なもので、言葉を知っているだけで見方が少し変わると思いま"],["cmsrgkip76zgm","https://www.instagram.com/reel/DaDzigKqmh5/","骨架、動作","Follow 4 unmpalumpa drawingtips!"],["cmsrgkior0igl","https://instagram.com/p/DbvZnOalGuT","骨架、動作","個人メモ：上腕の構造 ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️腕の回転可動：回内回外の基本解説 FANBOX Patreon ■ENGLISH Movement of the Arm : pronation"],["cmsrgkink2qpw","https://x.com/formsketch_/status/2087608382106595422","骨架、動作","Shoulders finally made sense when I stopped drawing them like a fixed shape"],["cmsrgkin1qf64","https://x.com/mototaku96/status/2087448613429617037","服裝","イラスト描く時、袖や服の影を塗る際に、絵描き初心者がやりがちな①の影の付け方。 場所によってはアリですが、私は②の影の付け方も使うようになった時から、影の付け方がグッと上手くなったと実感してます。"],["cmsrgkimgmbt6","https://x.com/kokuren_1/status/2087644931913654673","骨架、動作","(無內文)"],["cmsr3fhojlvxr","https://www.threads.com/@comiclife08/post/Db9otY7E3KT","漫畫","「完稿檢測室」畫完才是漫畫的開始 — 2026漫畫創作線上課程， 第十堂課精簡筆記摘要😇 BARZ老師的課程摘錄， 這是本系列課程的最後一堂， BARZ老師以黑白漫畫的完稿為例， 舉了很多在完稿時的處理技巧， 尤其是整體畫面的景深層次處理， 收與放之間的取捨差異， 相信一定滿足"],["cmsr3fhnwvr4w","https://instagram.com/p/DavhTPfAd1b","服裝","Cloth rendering tutorial by @eladesuu_"],["cmsr2xzwtxcl5","https://instagram.com/p/Dbn1h_2jddS","光影","by @muzenik_tutorials ⠀"],["cmsr2xzvuxii5","https://www.instagram.com/reel/DaUpqL5gtud/","骨架、動作","Most artists miss this simple shape"],["cmsqavpr16o5k","https://www.threads.com/@paolinadual506/post/Dbc6wuJiJCx","繪圖技巧","圖層用法小妙方"],["cmsqapzsh1ioy","https://www.threads.com/@vampiry111/post/Db7z6WRjvHx","Procreate筆刷","正在準備了⛅️ procreate 雲筆刷！ 可以留言告訴我你還想要哪種類型的雲，我會盡力製作並收錄到這個筆刷集中，或者也可以許願希望我之後開發哪種筆刷～ 基本上都是一種筆刷用到底，全程都沒有換過色，筆刷自帶雙色效果和堆疊效果，完全是為自己的懶惰而誕生🌚 後續更新消息都會發佈在"],["cmsq5rz9wymyt","https://www.instagram.com/p/Db8QZKHiacq/","光影","色彩層次越多的圖，純黑色線會讓立體感下降 因為黑色是一種雙面刃 雖然最能吸引注意力 但也更容易增加色彩負擔 幫線條上色 整張圖繪更透亮！ 咖啡因的第一本教學書 《從零開始的日系角色入門》 開賣啦！ 實體書： 電子書："],["cmsq5rz8sobhy","https://x.com/fznutri/status/2086965296393253174","骨架、動作","Different face angles."],["cmsq1zh2y3pyd","https://x.com/mrsghoststudio/status/2086885512954954031","骨架、動作","Neck drawing tips ✍️ anatomydrawing"],["cmsq1zh2bhfd9","https://x.com/mk8h_art/status/2087137793898090693","骨架、動作","(無內文)"],["cmsq1zh1w0qkl","https://x.com/kokuren_1/status/2087264357138985404","骨架、動作","(無內文)"],["cmsq1zh0uivdd","https://www.instagram.com/reel/DZ-FOAihDfr/","骨架、動作","Common Beginner Mistakes When Drawing Portraits ✍️"],["cmsq1zgzteyo7","https://www.threads.com/@jyn_ixix/post/Db7ahljGAK2","繪圖技巧","有人問我是怎麼做到每天練習的， 我覺得要讓練習更永續性比起練習的方法是否有效來得更重要。盡量降低你和畫畫練習之間的阻力，例如不要畫太難的題材，把畫具都準備好，分別出一個畫畫的空間，這些都是有幫助的▓ 當然，若你愛上畫畫了，不是要逼自己畫多，反而要刻意的限制自己，否則眼睛、腰和手腕"],["cmsq1zgyxj81y","https://www.instagram.com/reel/DbziAW2DJEF/","服裝","金屬盔甲畫起來有夠帥，但沒畫好就容易變成灰色塑膠 😅 明明步驟都差不多：打底、分色、加深、上光⋯⋯ 但同樣的步驟，畫出來是「塑膠感」還是「金屬感」， 關鍵就在高光、反光，以及它們出現的位置。 33 秒拆給你看，老師怎麼處理這個關鍵細節。 留言告訴我們：你還想看老師處理哪種材質？"],["cmsq1zgyhbekk","https://www.instagram.com/reel/DbX5Hruu_m1/","Procreate筆刷","(無內文)","gone"],["cmsq1zgx53szk","https://www.threads.com/@muyan._.0320/post/Db2JlGek1-A","頭髮","這個地方到底怎麼畫啊啊啊啊"],["cmspk6c5jlt0n","https://www.threads.com/@t.tea_j/post/Db5_KT_kgef","骨架、動作","女性肌肉"],["cmspk6c4o3654","https://www.threads.com/@nazaya119/post/Db55DxbIxTF","Procreate筆刷",""],["cmsobw9b2l0l5","https://www.threads.com/@comiclife08/post/Db4f2Eak90O","漫畫","「完稿檢測室」畫完才是漫畫的開始 — 2026漫畫創作線上課程， 第九堂課精簡筆記摘要😇 小峱峱老師的課程摘錄， 老師分享了封面設計以及彩稿光影的技巧， 這堂課有別於其他課程， 不是以漫畫表演為主題， 而是以設計與圖像構成為主， 相信運用在漫畫上也是另一種思維， 尤其峱峱老師範"],["cmsobw995cz2p","https://www.instagram.com/reel/DbievGthgIF/","服裝","How to Paint Fabric Folds in 7 EASY Steps! (Kimono Rendering Tutorial) 📌 Original Video Link: 【 🎨 Artist: 像素喵喵 Translated from a Xiaohongs"],["cmso056qn5jr6","https://www.instagram.com/reel/DbzsR6TCLcs/","骨架、動作","Follow me."],["cmso056q5eu0g","https://www.instagram.com/reel/DaQVInAze8Y/","眼睛","Struggling with the 3/4 angle eye? Fix it with this 1 simple trick! 新手必學！超直觀的「平行四邊形」眼睛透視法，草履蟲都能學會！✨ 來自REDnote艺术家的教程 Id：6718177870"],["cmso056pnk8db","https://x.com/tatami_loop/status/2086796723180195844","速寫","正座の女性スケッチ 1minタイムラプス 手戻りを減らすコツは、開始3秒あたりの「角度と比率の補助線」かと。この場合は写真から比率を図るのではなく自分の知識の比率に当てはめて進めています。 参考資料：@grafit_studio GrafitStudioより、割引コードを再発行し"],["cmsnuy295kfqn","https://www.instagram.com/reel/DbnM2kPxp9B/","繪圖技巧","畫畫圖層模式用法"],["cmsnuy28rglxu","https://www.instagram.com/reel/DZ7vkIvNkU5/","骨架、動作","😭🤧"],["cmsnuy28cdger","https://www.instagram.com/reel/DZme9rtScMH/","繪圖技巧","破碎鏡子效果"],["cmsnuy27xkrh0","https://instagram.com/p/Da1StKgk2Y1","服裝","個人メモ：半袖を描くポイント ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️Tシャツのシワ：両腕の可動解説 FANBOX Patreon ■ENGLISH T-shirt folds and wrinkles:t"],["cmsn6h12d7ptv","https://www.facebook.com/reel/2912589422411056/","光影","頭像二分畫法，人臉二分怎么畫 頭像二分光影畫法來了，頭像怎么畫二分"],["cmsn6h11rnrti","https://www.facebook.com/reel/1007040005565681/","骨架、動作","How to draw arms using the Triangle Method"],["cmsn5kr89xgmh","https://instagram.com/p/DbVearfD4lW","骨架、動作","손목의 두께는 검지, 중지, 약지 세 손가락의 너비와 비슷하다."],["cmsmr82mtf3xs","https://instagram.com/p/DbppbGBk1Vo","骨架、動作","手臂畫法（收徒中）"],["cmsmr82meu3zi","https://instagram.com/p/Dbfm1nQEzhX","骨架、動作","人體繪畫-手"],["cmsmr82lu7efj","https://instagram.com/p/DbdbgJajVg9","服裝","by GY_ANIFORCE1 (X) ⠀"],["cmsmpyxkcuykl","https://instagram.com/p/Dbu221RNp36","骨架、動作","by maealgae1 (X) ⠀"],["cmsm0e4mgoy10","https://www.facebook.com/reel/1031222732597366/","速寫","【色彩速涂】防止摳細節的最好方法是不畫細節"],["cmsm0e4loivyx","https://www.facebook.com/reel/5433990956826862/","背景參考","畫植物場景教程"],["cmsm0e4l4wxqf","https://www.facebook.com/reel/1352461423580952/","骨架、動作","超簡單的手臂肌肉速記，簡簡單單啦"],["cmsm0e4kqfz37","https://www.facebook.com/reel/28146112234996141/","光影","兩張圖搞明白兩種上色風格的不同"],["cmsm0e4kb0ghq","https://www.facebook.com/reel/2519376071829050/","速寫","今天分享的內容是 我會怎麼做練習的目的與抉擇 小稿為什麼重要? 因為小稿能幫助你照顧整體的大關係 並且更有效益的做出畫面的取捨~ 甚麼是想要保留下來的重點，甚麼是可以省去不理的 藉此提升我畫面的控制能力"],["cmsm0e4jlycaf","https://www.facebook.com/reel/1035728582186837/","光影","procreate懶人藏色畫出五彩斑斕的白"],["cmslontd572kq","https://instagram.com/p/DbaFutgE1P4","骨架、動作","大腿結構"],["cmsl77kf37mhr","https://www.facebook.com/reel/1286546630293604/","骨架、動作","腰臀腿到底要怎麼連接才合適 作者：龍二繪畫"],["cmsl77kep4y0e","https://instagram.com/p/DaxK-Sqk1SN","光影","上色處理…"],["cmsl77ke9k6yj","https://instagram.com/p/DbF2AH6E7Jm","眼睛","眼睛教程來來來！"],["cmsl77kdpq3o6","https://instagram.com/p/DbnD2BPE0Jt","骨架、動作","臀部結構！"],["cmsj24cipeo22","https://www.threads.com/@jumjum._.jumjum/post/DajiIDzEvUC","繪圖技巧","你們畫布都開多大啊 為什麼大佬畫布再怎麼放大都不會糊"],["cmsj24cg7gpqu","https://www.threads.com/@raven_128_/post/DarzjSllHr0","Procreate筆刷","兩百萬人看過的Procreate描邊筆分享～！"],["cmsj24cezbyek","https://www.threads.com/@nima570216/post/Da5tisgk2Iz","背景參考","剛剛發現了好玩的東西，畫背景的有福了"],["cmsj042ju6p67","https://www.threads.com/@ylc0216/post/DbvJBe6kQWa","背景參考","捷運上遇見的景色 真的好美😍"],["cmsiyl5phpp74","https://www.threads.com/@webber1016liu/post/DbvLGd6E1R4","背景參考","颱風前的台北出大景啦！超美的火燒雲和霞光"],["cmsifnadbjot2","https://www.facebook.com/reel/3207979759590881/","繪圖技巧","厚涂教程之懶人大妙招！"],["cmsifnacphcqv","https://www.threads.com/@jian930304/post/Dbs4O6EAX5s","背景參考","我在屏東的午後拍到了這個畫面，美到起雞皮疙瘩..."],["cmsfwwd8riq1o","https://threads.com/@mon_511312/post/Dbo-lC0E2vz","眼睛","之前有做了簡單的眼睛繪製技巧 希望能幫助到你👍👍"],["cmsfnnyfnodjn","https://threads.com/@mangui.0111/post/DbpHEgnk_YH","骨架、動作","這真的屌爆了！！！ 絕對是每個畫畫人的福音 超級好用！"],["cmsex5l7se0r5","https://www.threads.com/@hsuevan1215/post/DbmwNealPvz","背景參考","充滿節奏感的都市畫面"]];
+const RAW = [["cmtwva48e7lsl","https://www.threads.com/@ping_ping_bear/post/DdDaEr8ibY9","","(無內文)"],["cmw2ecxp36cuv","https://threads.com/@_xxiva_/post/DfTaetHEl3-","光影","【繪畫筆記】 最近發現打開3D素材網站中的Matcap來速寫3D模型 對快速理解複雜物件的結構真的超方便的耶... 直接把正面對你的面一口氣整理成高光區塊 超好閱讀的～ 小小的新發現～☺️ *據說最早是ZBrush的開發團隊設計來讓創作者快速檢視模型的功能 那拿來速寫看結構真的變"],["cmvven25c7icq","https://www.instagram.com/reel/De9AGUlxz1F/","繪圖技巧","Procreate畫布尺寸到底建多大？"],["cmvvdvca3b09s","https://www.instagram.com/reel/De_qValxNT3/","光影","procreate如何畫光感？"],["cmvtxdawy8rd5","https://www.instagram.com/reel/DfEzH6oRCcZ/","繪圖技巧","這才是Procreate塗抹筆刷到的正確用法！"],["cmufdbrpb1ta7","https://threads.com/@mr.sci_science_tw/post/DdkcAKtkzz7","真實物件參考","(無內文)"],["cmu7uuhtajqmc","https://www.instagram.com/reel/DbKduBAAz8s/","繪圖技巧",""],["cmu7uuhs7n2yl","https://www.instagram.com/reel/Da2GWlQx0Ty/","繪圖技巧","《重新排序網格》的功能回來啦！ 我又可以想發就發，不糾結版面不好看了🤣 最近姓名貼的訂單咻咻咻的來 大家都想在開學前收到齁～～ 在排版製作的過程，突然覺得這個小撇步 也許有繪友很需要♥ 來拍一個吧！ 希望對各位創業之路，少踢一個小石頭😍 我們一起加油👏"],["cmu473bzl16im","https://www.facebook.com/reel/1058760370201744/","構圖","繪畫基礎常識"],["cmu3ftns50pyp","https://threads.com/@moss_0924/post/DdSrWgpkwKx","眼睛","逛素材的時候找到了這個酷東西"],["cmtz8t80e4ugn","https://www.instagram.com/reel/Db5U2RjSrwn/","繪圖技巧",""],["cmtz8t7wr3xqg","https://www.instagram.com/reel/DYwbDK7PQ0l/","繪圖技巧","線稿太糊怎麼辦"],["cmtz8t7o3ah9w","https://www.instagram.com/reel/Db0_k-xqlPo/","Procreate筆刷","(無內文)","gone"],["cmtwva4o5f3i6","https://www.instagram.com/reel/DbkM2XvxKhR/","Procreate筆刷",""],["cmtrx5gqofhoj","https://www.threads.com/@kurenaiaoy/post/Dc-Hn3wmjmj","骨架、動作","這個是人類全身的，也可以選男女"],["cmtrx5gnecyr1","https://www.instagram.com/reel/Db73XMJSf_w/","繪圖技巧","為什麼別人上色怎麼也塗不出去"],["cmtrx5glcigc6","https://www.threads.com/@nazaya119/post/Dc5bbrao4wd","Procreate筆刷","procreate筆刷 （不知道什麼類應該算萬能？） 萬能筆刷類：總之都能用 （置頂雲端可取） 補充說明：1鋪色好用（！"],["cmtrx5gk1v9my","https://www.threads.com/@_xxiva_/post/Dc4n8vrEmV4","速寫","喔喔喔！這個一定要幫忙高調！ 這位神速作畫的漫畫家南儀Yora老師，在文中最後強調畫圖如果要快 最推薦的就是平時多練Gesture Drawing(趨勢速寫/動態速寫)！！！ ♥♥♥這個完全就是阿瓦瓦的繪畫信仰耶～✨ 真心不騙，每天練習20分鐘的Gesture Drawing 繪"],["cmtrx5gfj1b35","https://www.threads.com/@krenzcushart/post/Dc1NbODEnbh","光影","多年前的一張習作,海巡時看到有同學在臨摹,整理了一下當時的過程放上來 大致是 線稿-> 掐通常比較暗的朝下的面和閉塞死角-> 壓暗整個環境,提亮天空-> 加上在暗部環境中的牆面燈籠階梯的固有色-> 摳出建築物被直射光照到的範圍> 補上暗部中朝上的面被天光藍的影響-> 加上直射光照"],["cmtrx5gckgvus","https://instagram.com/p/DcyglwDDZHe","背景參考","How to draw a Water Ripples by @nelvin_cs ⠀"],["cmtjqs16m07mz","https://www.threads.com/@ucookna/post/C-Jwaq4T3Mt","Procreate筆刷","Hi 我是Una✨ 我做了20支排版筆刷想與大家免費分享！ 希望這套筆刷能為大家帶來很多靈感🧚‍♀️ 領取方式我放在留言區哦～"],["cmtf89uxtxg0x","https://www.threads.com/@meroz.art/post/DcnncWsmneh","繪圖技巧","影片1: 距離讓OC寶寶動起來，又更進一步⋯⋯CSP原來有這種功能 （原本一直以為這是AE才有的🤡） - 影片2:工作時都在內心跟雞排講話。 賺了💰下班才有餘力畫二次元"],["cmtdtmbrek3ob","https://www.instagram.com/reel/Db2uoGphMhL/","繪圖技巧","快收藏這個影片吧"],["cmtcbvu2pbh4f","https://x.com/hallo_artwork/status/2092649337990136242","骨架、動作",""],["cmt8ey2dd5v99","https://instagram.com/p/DcGnLD4lDl4","骨架、動作","【フカンで推しの全身が描きたい】 フカンって、全身も描きつつ 顔を大きく描けるので 表情もしっかり描ける めちゃくちゃ便利な構図！🔥 ただ、個人的になんだけど アオリよりも 「角度がついている感」を出しにくい。 フカンっぽく描きたかったのに 超絶短足な推しが爆誕しただけ ってこ"],["cmt8ey2baarku","https://instagram.com/p/DbmVXsuAdBl","骨架、動作","Baca selengkapnya... Dalam menggambar figure dari samping kita akan dihadapkan pada pose torso karakter yang dinamis. Untuk menggambar pose "],["cmt5mfl1ptsuy","https://www.facebook.com/100092681797195/videos/1051347347895611/","光影","用顏色減淡圖層畫光不通透？少了這一步"],["cmt5mfk85r3bw","https://instagram.com/p/DcIxjhzCJ2J","速寫","最近社群上速寫團練陸續看到大家速寫練習，同時很多小畫家也跟我們反應：「雖然一直有在畫，但好像都在憑直覺，好像沒有進步...」 其實，速寫是有更好的方法可循的! 學院特別為大家整理了 K大的「人物速寫 4 大核心技能」： ① 抓趨勢 ➔ ② 圖形歸納 ➔ ③ 結構與體積 ➔ ④ 表"],["cmt3lw4w1jd7l","https://www.instagram.com/reel/DcPeq8tSVvM/","骨架、動作","How to Draw Crossed Legs Easily! | Seated Pose Anatomy & Foreshortening 📌 Original Video Link: 【 🎨 Artist: 画画的不二 Translated from a Xiaohon"],["cmt3lw4tegjxh","https://threads.com/@nazaya119/post/DcPz34aoxGB","Procreate筆刷","procreate筆刷 質感筆刷類：蠟筆 （置頂雲端可取） 原文指路： 作者："],["cmt13e978lwle","https://www.facebook.com/reel/4498765033713798/","風格","繪畫基礎常識"],["cmt13e96laxxx","https://www.facebook.com/reel/1225458093011124/","眼睛","最全的眼睛高光畫法答疑"],["cmt13e95ou6ps","https://www.facebook.com/reel/1017713271057708/","繪圖技巧","繪畫基礎常識"],["cmt13e93luhub","https://www.threads.com/@_xxiva_/post/DcKri1QkiDl","構圖","一點關於透視與視覺引導的筆記✍️ 之前關於視線阻擋的部分好像太缺乏解釋 來補足一下～✨ P.S: 其實未必是一定要把視線擋住或反彈 依據目的像是如果是在一個剪輯很快速的動作場次中 其實引導都擋住反而讓人視線過度徘徊 失去畫面的單純明快印象"],["cmt13e921v69y","https://x.com/8___0c/status/2089726209982861607","骨架、動作","(無內文)"],["cmt13e91ryusn","https://x.com/palmie_oekaki/status/2089912745307332732","骨架、動作","「身体の流れ」があるとキャラが魅力的になります✨"],["cmt13e90v0nbg","https://www.threads.com/@palmie_oekaki/post/DcNLyBkmpZR","骨架、動作","指を指すポーズの描き方👈"],["cmt13e8zuqtqm","https://x.com/hatsudayoooo/status/2089314639494688870","骨架、動作","頭部の描き方で、上向下向きが一番描くのが厄介かと思うんですが 自分の描き方のコツとしては「耳の付け根」と「顔の三角形」をつなぐ意識で補助線を引くと いい感じに立体に感じる手助けになってくれます。 ご査収ください。"],["cmszb2s87tf8d","https://www.instagram.com/reel/DcI48PHPkEL/","骨架、動作","How to Draw Legs THAT LOOK GOOD! (Anatomy & Perspective Hack) 📌 Original Video Link: 【 🎨 Artist: 龙二绘画 Translated from a Xiaohongshu (REDno"],["cmszb2s5nkvmw","https://instagram.com/p/DcJAW63vX6f","骨架、動作","가슴과 엉덩이 근육의 세로 길이를 비슷한 비율로 잡아 준다.여성은 가슴보다 엉덩이의 세로 길이를 조금 더 크게 잡아 볼륨을 표현한다."],["cmsxvhvxq9b98","https://x.com/tatami_loop/status/2087933979030917527","骨架、動作","横から見た、左右の膝の高さに関する考察が流れてきたので、昨日のスケッチをもとに考えてみました。 リラックスした立位のポーズでは、奥の右膝が低い位置に見える場合、骨盤も右下がりだと予想できます。よって理屈上はスカートの左縁が上がるはず。この膝とスカートの左右の高さの不一致がきっかけ"],["cmsxvhvx7qnoj","https://x.com/palmie_oekaki/status/2088764176273698922","眼睛","印象的な目の塗り方✨"],["cmsxvhvw8a2l4","https://x.com/sodaguyx/status/2088821650435325965","骨架、動作","male vs female torso"],["cmsxvhvvhaa5a","https://x.com/palmie_oekaki/status/2089126564315435337","光影","光源別 影の練習例☀️"],["cmsxvhvurjv9w","https://x.com/palmie_oekaki/status/2088825583040122994","服裝","制服のリボンの基本の形🎀"],["cmsxvhvu93dzk","https://x.com/palmie_oekaki/status/2088944363363791290","眼睛","立体的な目の構造✍️"],["cmsxvhvtsd0kb","https://x.com/ito_pro_illust/status/2088928756182520243","骨架、動作","腰に当てる手が描けない人へ"],["cmsxvhvtae6kh","https://x.com/limbosketch/status/2088989284044861786","服裝","Folds are simpler than you think"],["cmsxvhvrkrfvj","https://www.instagram.com/reel/DZH8Iv0AAur/","光影","🤧🖤"],["cmsxvhvr2ytms","https://www.instagram.com/reel/Da1z90JR0Rd/","骨架、動作","Is Your Neck Too Straight? | 脖子畫太直了嗎？ 摸摸哩"],["cmsxvhvqcdvd7","https://www.instagram.com/reel/Dbacwlpg43V/","服裝","神秘篼帽畫法"],["cmsxvhvpl9bid","https://www.instagram.com/reel/DZ-VhBmhEOA/","骨架、動作","How to Draw Legs CORRECTLY (In 30 Seconds!) ⚡🦵 光速教會你畫出美腿！ 這是來自REDnote藝術家的教程 Id@畫嚒嚒"],["cmsxvhvp4uz09","https://www.instagram.com/reel/Dafb0PGzYNI/","骨架、動作","a_designer_my 於 July 7, 2026 : \"臀畫好了，腿不會加怎麼辦？"],["cmsxvhvmxd547","https://www.threads.com/@zudarts_lee/post/DcGNrYYjr3w","背景參考","分享場景般的作業點評精華 其實畫畫不只要感性，不只要爽，也需要理論來支撐 第三周作業點評 話雖如此，但有時候也會擔心塞太多知識理論，怕資訊太多XD"],["cmsxvhvlxi7wp","https://www.threads.com/@ito_pro_illust/post/DcFUj5FAZfI","光影","顔のライティングが分からない人へ"],["cmsxvhvl7ufkz","https://x.com/comixsenpai2005/status/2088655438279586067","骨架、動作","I love heads, I love em so much."],["cmsxvhvkqh39u","https://x.com/palmie_oekaki/status/2088552783675068857","骨架、動作","振り向きポーズのポイント💡"],["cmsxvhvk9zr6l","https://x.com/ezdrawps/status/2088297293367706036","骨架、動作","Head angulation can be difficult"],["cmsxvhvjjl0j1","https://x.com/lumicanvass/status/2088400475909505274","背景參考","Trees get easier when you stop drawing every leaf 🌿"],["cmsxvhvizt9iv","https://x.com/nana__ogw/status/2088607698908844508","速寫","30sec"],["cmsxvhvifvhy4","https://x.com/ref_pics/status/2088319121372909703","光影",""],["cmsxvhvhpjkgr","https://x.com/limbosketch/status/2088214439434543548","眼睛","Eyelashes flow"],["cmsxvhvggmtya","https://x.com/tatami_loop/status/2088594700580348027","骨架、動作","肘の内側上顆(再掲) 内側の骨を意識すると、肘が少しだけリアルになります。描き込みが濃いとゴツゴツするので、陰影で軽く表現する程度がおすすめです。"],["cmsu1q0m0pbkg","https://instagram.com/p/Db-50kSDXhs","服裝","by @muzenik_tutorials ⠀"],["cmsu1q0kpykrq","https://www.threads.com/@pink.linhh/post/Db-J8hxFAHO","真實物件參考","summer ☀️☀️☀️"],["cmstk536rfxac","https://www.threads.com/@jioa_huang/post/DbhZnfSCII2","骨架、動作","(無內文)"],["cmst3bgdxry90","https://www.threads.com/@mon_511312/post/DcAxlxIE45e","光影","我之前做了一個簡化上色的技巧 可以參考看看！希望能幫上你⭐"],["cmst11phhiq45","https://www.threads.com/@student_lai_photo/post/Db99AMck9YK","背景參考","我拍下了我眼中不一樣的「雲林」。"],["cmssbtcubs1c6","https://www.instagram.com/reel/Db4tapeRS8y/","骨架、動作","What’s Different? | Male vs Female Body Proportions 男女畫法差異"],["cmssbtcs85zcv","https://www.instagram.com/reel/DbxPifGhN3G/","骨架、動作","How to Master 3/4 View Head Perspective (Simple Spherical Grid) 📌 Original Video Link: 【 :2pm teb:/ 11/24 C@h.oq 】 🎨 Artist: 画画的草履虫金木木 Tra"],["cmsrkpo4sm4gy","https://x.com/chalian1005/status/2087779590316138960","骨架、動作","(無內文)"],["cmsrk9g04j126","https://www.threads.com/@paolinadual506/post/Db-buXIjadc","Procreate筆刷","今天畫畫真是太不小心了"],["cmsrgkiozdqb5","https://www.instagram.com/reel/Db92lGvNeOV/","骨架、動作","Pecho femenino✍️✨"],["cmsrgkinthqzl","https://x.com/tatami_loop/status/2087596073158390218","骨架、動作","写真資料を使った背面スケッチ 身体に等高ラインを示したポーズ集。各部の傾きや奥行き方向のボリューム、骨のランドマークを観察する練習にかなり便利です。 あとぴっちりタイツが簡単に描けるメリットがあります。これならセンシティブ判定を回避しやすいはず… 参考写真の提供：@grafit_"],["cmsrgkinbp157","https://x.com/mrsghoststudio/status/2087630702330221040","眼睛","Anime eye inking process 👁️✨"],["cmsrgkimr35ac","https://x.com/mrsghoststudio/status/2087652042080669899","構圖","Head and shoulder angles ✍️📐"],["cmsr3fhp90zcs","https://www.instagram.com/reel/DZU0ypLAwFm/","骨架、動作","😊♥️"],["cmsr2xzx9ymwa","https://instagram.com/p/DbZcUh4E9p0","骨架、動作","個人メモ：胴体・性別のシルエット ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️胴体の研究①・胴体『前面』の骨と筋肉解説 FANBOX Patreon ■ENGLISH Structure of the Tors"],["cmsr2xzw4bmp0","https://www.facebook.com/reel/1670865104004143/","骨架、動作","tips nhanh lưu lẹ"],["cmsr2xzvmrvgn","https://instagram.com/p/DasXXYyFHp-","骨架、動作","個人メモ：胴体の自然な伸展可動 ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️胴体の可動『屈曲・伸展』解説 FANBOX Patreon ■ENGLISH Movement of the Torso : Flex"],["cmsqapzt2jcjg","https://instagram.com/p/DbAIKp3jwpV","骨架、動作","個人メモ：腕組みポーズ ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️腕の複合可動②：基本解説 FANBOX Patreon ■ENGLISH Combined Movement of the Arm FANBO"],["cmsq5rzak65rm","https://www.facebook.com/100092681797195/videos/2104991010390688/","繪圖技巧","繪畫基礎常識"],["cmsq5rz96zx6r","https://x.com/vulpe922/status/2087445035143123393","骨架、動作","ｾﾝｼなっちゃったので再掲"],["cmsq5rz8dd8z2","https://x.com/mrsghoststudio/status/2087320238794658114","骨架、動作","Hand anatomy explained ✍️✋"],["cmsq5rz7m6qg9","https://www.threads.com/@xiko_xx_/post/DbV0P8Eidue","繪圖技巧","每天練習畫畫 練到ㄈ級分之前都不停下來"],["cmsq1zh2jqxjk","https://x.com/limbosketch/status/2087255099898810389","頭髮","Almost every type of bangs for your OC's hairstyle"],["cmsq1zh24xyy0","https://x.com/popycornio/status/2087260632387047566","骨架、動作","Simple sketches need strong foundations. Break the figure into basic shapes and build from there"],["cmsq1zh192qro","https://x.com/ezdrawps/status/2087309283905937513","骨架、動作","See the diference?"],["cmsq1zh08wudc","https://www.threads.com/@paolinadual506/post/Db7lxBXmhB5","眼睛","眼珠子畫法示意"],["cmsq1zgz54pe6","https://www.instagram.com/reel/DaTIfF7I8eY/","光影","Best Procreate Brushes-Brusher in App Store 🖌️ Get all premium tools and daily drawing tips for your art 🖼️ DM me for brush support or col"],["cmsq1zgypr733","https://www.instagram.com/reel/DbX5Hruu_m1/","繪圖技巧","(無內文)","gone"],["cmsq1zgy99cwh","https://instagram.com/p/Db7NykTlIcI","骨架、動作","個人メモ：胸の付き方 肩の基本構造(静止) FANBOX Patreon ■ENGLISH Structure of the shoulder basics FANBOX Patreon ■中文 肩膀的基本结构（固定式） Patreon"],["cmspk6c5qngzr","https://www.threads.com/@t.tea_j/post/Db5_aNoksi1","光影","選色"],["cmspk6c4wc62s","https://instagram.com/p/Db5M_JqNQqA","眼睛","If you are difficult to draw eyes from the side, understand it as a figure. When you look at the side of the anime characters, you can see t"],["cmspk6c2hfxo4","https://www.instagram.com/reel/Da3fvYkt-Pq/","光影","Draw with me in Procreate"],["cmsobw99y4sqn","https://www.instagram.com/reel/DZF4P9XtN0Q/","光影","3000+ Brushes — Brusher in App Store 🖌️ Get all premium tools and daily drawing tips for your art 🎥 💜 🚨 DM me for brush support or colla"],["cmso056qvf53m","https://www.instagram.com/reel/DbYCCSyzOc3/","繪圖技巧","✨使用克隆工具增加畫面質感✨ 當你的插畫好像少了點質感，就能使用這招！ 輕輕鬆鬆就能增添畫面細節🤩 趕快分享小技巧 給想學畫畫的朋友吧🙌"],["cmso056qemjic","https://www.instagram.com/reel/DZfWoDHsJk3/","骨架、動作","🥀✅❌"],["cmso056pwg16q","https://x.com/depressramiart/status/2086878998437433704","光影","tummy render tutorial ❤️"],["cmsnuy2a685no","https://www.instagram.com/reel/DYWtbNZx3mG/","光影",""],["cmsnuy28y0euz","https://www.instagram.com/reel/DZ21Wy8zK5j/","服裝","How to Draw Folds for 4 Different Fabrics! 🧥✨ 如何畫4種不同面料的衣褶！"],["cmsnuy28jae5h","https://instagram.com/p/Dak-oKZjAtn","骨架、動作","(Pull down for english ) 🇫🇷 - Études d’abricots (les vraies savent). 🇬🇧 - Apricot studies (the real ones know). Drawn on my tablette @xp"],["cmsnuy28480j7","https://www.instagram.com/reel/DZ9RH7fTSfD/","骨架、動作","(無內文)","gone"],["cmsnuy27p57qg","https://www.instagram.com/reel/DbmQgFRi5fO/","骨架、動作",""],["cmsn6h123g747","https://www.facebook.com/reel/2244833489778439/","骨架、動作","Anatomy Hack You NEED to Know"],["cmsn5krajmxxg","https://instagram.com/p/DbdMhFuDwrZ","骨架、動作","안경은 눈의 기울기에 맞춰 배치한다. 안경을 올리거나 내려도 양쪽 렌즈에는 높낮이 차이가 생길 뿐, 렌즈의 기준선은 눈의 기울기와 평행하게 유지한다."],["cmsmr82n065hb","https://instagram.com/p/Dbnc6WWvN8_","骨架、動作","손바닥은 새끼손가락 아래의 볼륨이 손목까지 이어지는 하나의 덩어리 구조를 이룬다. 이 연결감을 표현하면 손의 입체감이 더욱 자연스러워진다."],["cmsmr82mmgpwd","https://instagram.com/p/DbvOILmv-pw","骨架、動作","몸의 회전 각도에 따라 손이 보이는 면도 함께 달라진다. 정면에서는 손 옆면, 반측면에서는 손 반측면, 측면에서는 손등면을 기준으로 표현한다."],["cmsmr82m5fast","https://instagram.com/p/DbKEjGAj4OZ","骨架、動作","個人メモ：横から見た胴体のライン ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️胴体の研究①・胴体『前面』の骨と筋肉解説 FANBOX Patreon ■ENGLISH Structure of the Tors"],["cmsmpyxm8fjmh","https://www.facebook.com/reel/2033130784007400/","光影","四分之三側臉光影結構，畫光影一定要懂結構"],["cmsm0e4n1b6c8","https://www.facebook.com/reel/1316097680674440/","服裝","怎么才能畫好衣褶 衣褶畫法，衣褶筆刷畫起來也快，襯衣畫法"],["cmsm0e4lwgvlm","https://www.facebook.com/100092681797195/posts/952300484536003/","骨架、動作","3/4頭像示范||"],["cmsm0e4lb7a81","https://www.facebook.com/100092681797195/posts/958043950628323/","骨架、動作","手部素材||"],["cmsm0e4kxycvc","https://www.facebook.com/reel/982436421034983/","骨架、動作","繪畫基礎常識作者：NIRO"],["cmsm0e4kiono8","https://www.facebook.com/reel/976664208749966/","繪圖技巧","ipad畫畫到底建多大的尺寸？"],["cmsm0e4jwgpig","https://www.facebook.com/reel/1051234857403947/","速寫","分享一點速寫的經驗 這種剪影起稿對於造型蠻有幫助的 但會建議嘗試前可以先具備良好的線稿結構能力更好"],["cmslonteitpea","https://www.facebook.com/reel/28308616702093927/","骨架、動作","亂畫耳朵的后果，就是毀掉下頜線！"],["cmslontciq417","https://www.facebook.com/photo.php?fbid=122111270445294669&set=a.122099947389294669&type=3","服裝","facebook.com"],["cmsl77kewl6mb","https://instagram.com/p/DafPnMVE-GB","構圖","人體體🥢透視分享"],["cmsl77kehcjat","https://instagram.com/p/Daz0Yg-EzOi","構圖","300+模板「舉手」拿"],["cmsl77ke0zgfn","https://instagram.com/p/DbIZrggkwfH","光影","臭寶，該學畫畫啦！"],["cmsj24ckejfqs","https://www.threads.com/@huiping3939/post/DYYgv1inxZu","背景參考","夏之豔… 💙❤️💛💚 在台南林森路二段(東寧派出所至後甲國中對面成大校區旁)"],["cmsj24ch0svj9","https://www.threads.com/@sydneyyyyyy_s/post/DaimqU4j8pQ","背景參考","颱風前夕看到好多好漂亮的海島景色忍不住想留一串紀錄在這邊"],["cmsj24cfa0m5f","https://www.threads.com/@abao.douliu/post/Da5DD9qj0G2","背景參考","這兩天的斗六是怎～麼～回～事～啦 水嘎啊餒 🌈"],["cmsj0ickq85e8","https://www.facebook.com/reel/890729184106520/","繪圖技巧","繪畫基礎常識"],["cmsj042k5f0rr","https://www.threads.com/@kiasherria/post/Dbmq9zADpWF","光影","整理了一份平常畫圖時，思考色彩的方式 假設你是一直以來，喜歡我的彩圖 且想知道我是如何選色的人 希望這份色彩思考可以幫助你 怎麼去思考、跟判斷配色 內容還有包含標出色盤選色範圍 （連結下收）"],["cmsiyl5q85m63","https://www.threads.com/@luchi.film/post/Dbp66E7kZn0","風格","沒想到把照片轉成 Halftone Screen 效果竟然如此療癒，就像做出自己的海報！"],["cmsirw06r55jd","https://www.threads.com/@gamefornitendo004008/post/DbuCT2EEysX","背景參考","聽過雨蝶 但你看過雨蝶嗎"],["cmsifnad0zrte","https://www.facebook.com/reel/890729184106520/","頭髮","繪畫基礎常識"],["cmsfx4el76w0z","https://www.facebook.com/reel/1035728582186837/","光影","procreate懶人藏色畫出五彩斑斕的白"],["cmsfwwd8kofne","https://www.threads.com/@sakakibara0_0/post/Dbn6M-riRYI","繪圖技巧",""],["cmsfnbe4gjvvv","https://www.facebook.com/100002498930298/posts/23931117869888176/","骨架、動作","分享剛剛找到的好棒動作參考網站👀 可以自己調整人偶姿勢，再讓網站自己幫你尋找動作相近的參考圖 比之前自己在Pinterest查關鍵字狂找參考圖省時滿多的 不過人偶可動性沒有到很高，可能還是會有一些姿勢擺不出來 滑鼠左鍵點關節球拖曳：變更動作 滑鼠滾輪按住拖曳：調整視角 滑鼠右鍵"],["cmsewnocn3oyc","https://www.threads.com/@moose.8763188/post/DbmvrMFAmv8","背景參考","昨日長岡で見た太陽が浮世絵だった。"],["cmtcqph2hs8i8","https://www.threads.com/@wal_aabb/post/DcilRUsiQp3","","我有一劍，名曰晚霞"],["cmsxvhvq3xzt2","https://www.threads.com/@lambliver0420/post/DcG2vKuGFlm","","這是一套給繪師／創作者使用的個人作品網站模板。 網站包含作品集、委託案例、委託資訊、個人介紹與 SNS 等頁面，作品與網站內容也可以透過 Notion 自行更新，不需要每次修改都碰程式碼。 整體以作品展示為主，希望讓創作者可以有一個簡單、完整，也方便長期維護的個人網站。 Demo"],["cmw0vnz870bk7","https://www.threads.com/@mimitsoi_hk/post/DfRWCbMmtKO","光影","最近用AI開發新工具，做了一個調色器，可模擬光影配色，也可匯出色票供Clipstudio及Procreate使用"],["cmvve6w9piyu3","https://www.instagram.com/reel/DZ7H8ojvVSc/","光影","繪畫小技巧"],["cmvtxnd3mxjor","https://www.instagram.com/reel/DewHSozx9s7/","背景參考","procreate背景糊弄大法！"],["cmuz2yr8qoyc6","https://www.threads.com/@skrt1023_/post/DeM7efuHfMF","速寫","突然想到大二的暑假作業還沒發 那時候要畫70張的樣子 全部擠在開學前狂畫 重點是根本沒去那些地方 全部都是以前手機的照片"],["cmufdbrmihzjx","https://www.facebook.com/reel/3749790505172654/","骨架、動作","胯部連接始終理解不了？三分鐘教會你 零基礎適用"],["cmu7uuhtul39a","https://www.instagram.com/reel/DdbpwVJTSAu/","眼睛","為什麼你的眼神不對焦？ 【画久久的作品】"],["cmu7uuhsqrkk6","https://www.instagram.com/reel/Db5SrpDPTph/","繪圖技巧","畫畫小技巧"],["cmu6edvyfzzuy","https://www.instagram.com/reel/DbIHS2IPfb0/","繪圖技巧","提取線稿邪修教程"],["cmu0k1x093c93","https://www.threads.com/@nazaya119/post/DdN_ilvo6n0","Procreate筆刷","procreate 筆刷 特殊筆刷類：為人方正 （置頂雲端可取） 補充說明：無"],["cmtz8t7x9drdu","https://www.instagram.com/reel/DcwzcBvzbqo/","繪圖技巧","Drawing fundamentals edition 📦 📦"],["cmtz8t7p2mc4d","https://www.instagram.com/reel/DZuMGEYP29Y/","Procreate筆刷","(無內文)"],["cmtz8t7nlvc14","https://www.instagram.com/reel/Dbm1GPfJkSi/","Procreate筆刷","(無內文)"],["cmttpp57f7vih","https://www.threads.com/@honghongxw/post/DdCMlCkj45D","Procreate筆刷",""],["cmtrx5gop5pz6","https://threads.com/@nuomi0213/post/Dc7-jiUI0Xc","Procreate筆刷","筆刷大師Kyle T. Webster 教大家如何在 Procreate 建立筆刷！ 筆刷系統大概是Procreate最迷人也最複雜的一塊 Kyle T.透過內建筆刷教大家如何建立新的筆刷 從中我們可以看到每個筆刷的參數是如何影響筆刷的變化 長達一個多小時的”免費課程“ 非常值得"],["cmtrx5gm0hbfn","https://www.instagram.com/reel/DcgoltmygTR/","繪圖技巧","最後一招太實用了😳 這樣就不用一直切來切去了 40秒把所有procreate的 基本操作都搞懂！！！ 還不趕快追蹤分享起來！"],["cmtrx5gl06y2i","https://threads.com/@nazaya119/post/Dc5dU0Po5yE","Procreate筆刷","procreate 筆刷 質感類：想來點質感嗎？ （置頂雲端可取） 補充說明：無"],["cmtrx5giqmppe","https://www.threads.com/@cmt_6_04st/post/Dc3Ig81E4yC","Procreate筆刷","(無內文)"],["cmtrx5gf7vh99","https://www.threads.com/@krenzcushart/post/Dc1NbODEnbh","背景參考","多年前的一張習作,海巡時看到有同學在臨摹,整理了一下當時的過程放上來 大致是 線稿-> 掐通常比較暗的朝下的面和閉塞死角-> 壓暗整個環境,提亮天空-> 加上在暗部環境中的牆面燈籠階梯的固有色-> 摳出建築物被直射光照到的範圍> 補上暗部中朝上的面被天光藍的影響-> 加上直射光照"],["cmtrx5gas4vr0","https://www.threads.com/@meilinlin_0/post/Dcx0-QIkw3S","光影","🎨繪畫技巧與流程分享 最近畫了兩張自己小說的角色，總結了一些Procreate畫人物時的流程跟習慣，分享給需要的人～～但都是很基礎的東西🤣 【流程】 P1 1）我習慣先畫黑白稿，確認素描關係，這個環節佔據80%時間，畫完這個後續就會很快了。 2）拿黑白稿上漸層對應/梯度映射，"],["cmtiluil6dhkb","https://www.facebook.com/reel/949995314037806/","Procreate筆刷","夏日窗臺 夏天藏在窗里，云在慢慢流浪??"],["cmtf89ux88ng7","https://www.threads.com/@krenzartwork/post/Dcn3rCzmx8W","骨架、動作","可以先把人體簡化成幾個幾何體，像胸腔、骨盆、手腳先當成方塊或圓柱，先理解它們怎麼轉、怎麼接，通常會輕鬆很多。 另一種方法則是先抓外輪廓跟大形，先把人物整體形狀畫準，再慢慢往裡面補結構跟細節。 簡單來說，一個偏\"從裡面理解體塊\"，一個偏\"從輪廓抓形狀\"。兩種都可以練，看哪一種比較適"],["cmtdtmbs0utsa","https://www.instagram.com/reel/Db6xa0OBMuJ/","構圖","【 攝影小技巧 - 用前景做加法 】 想讓單調的畫面變得比較豐富 我們可以試著幫畫面做加法 幫主體增加一些相關元素進去 這樣就可以拍到比較有層次的畫面喔！ 想學習更多攝影技巧和思維 歡迎追蹤我一起進步👋🏻"],["cmtcbvu2zwudl","https://www.threads.com/@wise_not_wise732/post/DciGgHpEtma","Procreate筆刷",""],["cmtcbvtwqp0a4","https://www.threads.com/@seki_ichi0909/post/DcdEuH4k_vb","頭髮","草稿>分前後色塊上色>噴漸層底色>用更多色塊跟碎面疊出頭髮（一種疊疊樂⋯⋯）"],["cmt8ey2bv4mjb","https://www.instagram.com/reel/Db5RlJkz2gI/","骨架、動作",""],["cmt8ey2aul7kx","https://instagram.com/p/DbdAWjqk2_X","骨架、動作","大腿結構！"],["cmt5mfkcvstmr","https://www.instagram.com/reel/DbVOyMyPmiC/","頭髮","動感頭髮怎麼畫"],["cmt3px2fywomm","https://www.instagram.com/reel/DcUpaJEBO7z/","骨架、動作","How to Construct & Add Muscle Anatomy to Rough Sketches! | Drawover Tutorial 📌 Original Video Link: 【 🎨 Artist: 龙二绘画 Translated from a Xia"],["cmt3lw4uf0uzl","https://www.threads.com/@su_huangpin/post/DcOSY1siaTx","真實物件參考","特富野古道的光線真的太多變化 能夠走在森林裡真的太幸福了！"],["cmt13e997ucgo","https://x.com/palmie_oekaki/status/2090002335041012132","眼睛","かわいい・キレイ系の目の描き方👀"],["cmt13e96x7jlb","https://instagram.com/p/DcOcmwPCVwg","骨架、動作","簡單標註了畫腋下時需要注意的身體構造 可以看到肌肉到完稿 變化還是很大的 因為還要考慮皮下脂肪的分佈 關於這些結構的細節 我會再貼文詳解 咖啡因的第一本教學書 《從零開始的日系角色入門》 開賣啦！ 實體書： 電子書："],["cmt13e95etaod","https://instagram.com/p/DcN5i0Jk09F","骨架、動作","臀部畫畫分解！（有課程提供大家學習哦）"],["cmt13e93aa7io","https://www.threads.com/@allen88228/post/DcLXWG1gYVO","真實物件參考","在海拔𝟳𝟬𝟬多公尺的山裡喝咖啡 ⟣ 位於三峽 の 山林秘境， 存了好幾年才終於到訪，這美景真的愛了 🫪"],["cmt13e9158v2q","https://www.threads.com/@_xxiva_/post/DcNFa1jEpXB","構圖","哈囉，如果是場景與構圖相關書籍的話 爆推這兩本吉田誠治老師的書喔：(超級精彩又好懂易消化) 「吉田誠治作品集&掌握透視技巧」(北星出版 IG: @ nsbooks_official ) 「TIPS！吉田誠治插畫描繪技巧提升教學手冊」(尖端出版 @sppbooks ) 構圖速寫練習"],["cmt13e90ktcye","https://www.threads.com/@zhimeow_222/post/DcJQ9RrAcId","繪圖技巧",""],["cmt13e906ajqu","https://x.com/kcreed11/status/2089598259492999582","骨架、動作","많이 그리게 되는 골반을 뒤로 빼는 동세! 를 그릴 때는 확실하게 골반이 뒤로 가는 등고선을 만들어 줘야 이쁜 허리 라인을 만들 수 있어요~!"],["cmt13e8zize9n","https://x.com/designatmo/status/2089659842449244321","眼睛","The final highlights are what turn a flat eye into glass"],["cmszb2s60c3sv","https://instagram.com/p/DcLXu9hvrkz","眼睛","게슴츠레한 눈을 표현할 때는 얼굴 각도에 맞춰 기본 눈의 세로폭을 절반 정도로 줄여 그린다."],["cmszb2s57b5u5","https://instagram.com/p/DcJ5xlgk4NS","服裝","PERSONAL NOTE: Tips for Drawing Dress Shirts: Cuffs & Collars ❇️Available on Patreon❇️ ✴️check out the direct link in bio!✴️ ⬇️or copy this "],["cmsxvhvxhnpsw","https://x.com/tatami_loop/status/2089239275661574429","骨架、動作","女性の脚のシルエット（再掲） 膝や足首の内外の凹凸の関係を知っていると、脚の違和感を軽減できると思います。"],["cmsxvhvwqs3ft","https://x.com/limbosketch/status/2089164829487493596","服裝","Sweater!"],["cmsxvhvvq9uvf","https://x.com/limbosketch/status/2089027354421043368","頭髮","For your girl OC"],["cmsxvhvv00tsa","https://x.com/limbosketch/status/2089027140075376990","骨架、動作","Don't forget the trapezium!"],["cmsxvhvuijm1i","https://x.com/deskmatis/status/2089060193262764435","骨架、動作","Great tip! Never forget it!"],["cmsxvhvu1sie0","https://x.com/limbosketch/status/2089094946498269482","骨架、動作","Nice perspective exercise you should try"],["cmsxvhvtiipak","https://x.com/ganet_p/status/2088949416392794452","光影","두상 명부,암부 곡선 방향 헷갈리는 분들 팁. 구 형태 도형에 1차명암으로 폼쉐도우를 넣어 보면 이해하기 쉽습니다. 예시로 초승달-보름달-그믐달의 순서로 모양을 생각해 볼 수 있습니다."],["cmsxvhvt155mp","https://x.com/kokuren_1/status/2089038430231826712","骨架、動作","16"],["cmsxvhvrcwk8n","https://www.instagram.com/reel/DaDcBWfTGvm/","服裝","4 Master Formulas for Drawing Fabric Folds 4個公式帶你輕鬆搞定所有衣服褶皺。 衣服褶皺的乾貨教學教程！ 來自REDnote藝術家的教程 Id：357341230"],["cmsxvhvqt6qcm","https://www.instagram.com/reel/DbvBlyPTbC9/","骨架、動作","(無內文)","gone"],["cmsxvhvpvwzgw","https://www.instagram.com/reel/DZupLsGzhgw/","服裝","6種不同類型褶皺的繪製教程"],["cmsxvhvpdbe2l","https://www.instagram.com/reel/Da2Y65FhtEU/","背景參考","This is a small sketch demonstration and explanation from one of my classes."],["cmsxvhvon3xj5","https://www.instagram.com/reel/DcDIOmntA9q/","骨架、動作","Pecho femenino✍️✨"],["cmsxvhvmogso5","https://www.threads.com/@moriiiii_ice/post/DcFdt-BCacC","服裝","スカート📝"],["cmsxvhvm74yho","https://www.threads.com/share/_lnCo4MMq/","真實物件參考","(無內文)","gone"],["cmsxvhvlopp5n","https://www.instagram.com/reel/DZeT-ufC9Jt/","骨架、動作","Head drawing tutorial by artist Ryuji's (龙二绘画) — a clear and structured approach to building the head using simple construction lines, propo"],["cmsxvhvkzgsbr","https://x.com/spdr_p/status/2088066111128674319","繪圖技巧",""],["cmsxvhvkho674","https://x.com/uo_3987/status/2088559343524610276","骨架、動作","頭は置くではなく首に刺し込むイメージ"],["cmsxvhvk029uy","https://x.com/limbosketch/status/2088209327907651739","骨架、動作","If you are struggling with kneee try drawing like this"],["cmsxvhvj9ddaw","https://x.com/kokuren_1/status/2088350607472304216","骨架、動作","14"],["cmsxvhvip86o8","https://x.com/formsketch_/status/2088386966807040213","骨架、動作","The shoulder blades really change everything"],["cmsxvhvi35i8o","https://x.com/a_nmanco/status/2088191620135207307","眼睛","メイキング...！！ これとかかも"],["cmsxvhvh9xzg8","https://x.com/chaba251114/status/2088616783234396334","骨架、動作","お練習"],["cmsu1q0mdn95b","https://www.threads.com/@_xxiva_/post/DcC6A4QEp_5","構圖","很多厲害的概念美術在畫草圖時，都是先畫一堆2公分x2公分左右超迷你的黑白小草稿"],["cmsu1q0liunqa","https://instagram.com/p/DblWa1yjCQu","骨架、動作","(pull down for english ⤵️) 🇫🇷 - Arrêtez de dessiner des ballons⚽. La poitrine a une vraie anatomie, une vraie physique, de vraies attaches","gone"],["cmstk537b8z1i","https://www.threads.com/@thootsithootsi/post/DblKkEFGrXy","背景參考","哇這個真的漫畫人的福音😭😭"],["cmst3mi6310zy","https://www.instagram.com/reel/DbSyAMFRvNl/","骨架、動作","How to Draw the Female Chest? | 女性胸部怎麼畫？ 摸摸哩"],["cmst2gsakh933","https://www.instagram.com/reel/DcAgD-9tmu8/","骨架、動作","Pecho femenino✍️✨"],["cmsssm6qipex6","https://www.threads.com/@krenzartwork/post/DcAg2hpkWvM","繪圖技巧","線條本身確實需要花一點時間做控筆練習，不過也可以先區分一下你看到別人的\"穩\"是哪一種。 有些看起來像一筆到位，其實背後可能已經 Ctrl+Z 很多次；也有一些是遠看線條很順，但放大之後其實還是有不少小抖動，這也很正常，很多漫畫家的線稿也是這種狀態。 所以不用把\"完全不抖\"當成標準"],["cmssbtcu38a2f","https://www.instagram.com/reel/Db7KML-MkYI/","骨架、動作","Pecho femenino✍️✨"],["cmsrkpo5o8kjs","https://x.com/desquolor/status/2087602781905432702","骨架、動作","some michael hampton ab studies, looking into torso material to try to get better at it"],["cmsrkpo41jwm5","https://x.com/tatami_loop/status/2087799368422412601","骨架、動作","胸のバージスライン（再掲） 乳房と胸郭の境界線をバージスラインと呼ぶそうです。（おそらくアパレル業界の俗称） 特にアオリのアングルでは「乳房の輪郭」と「バージスライン」を分けて考え、見え方に気をつけて描きたいところ。 不思議なもので、言葉を知っているだけで見方が少し変わると思いま"],["cmsrgkip76zgm","https://www.instagram.com/reel/DaDzigKqmh5/","骨架、動作","Follow 4 unmpalumpa drawingtips!"],["cmsrgkior0igl","https://instagram.com/p/DbvZnOalGuT","骨架、動作","個人メモ：上腕の構造 ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️腕の回転可動：回内回外の基本解説 FANBOX Patreon ■ENGLISH Movement of the Arm : pronation"],["cmsrgkink2qpw","https://x.com/formsketch_/status/2087608382106595422","骨架、動作","Shoulders finally made sense when I stopped drawing them like a fixed shape"],["cmsrgkin1qf64","https://x.com/mototaku96/status/2087448613429617037","服裝","イラスト描く時、袖や服の影を塗る際に、絵描き初心者がやりがちな①の影の付け方。 場所によってはアリですが、私は②の影の付け方も使うようになった時から、影の付け方がグッと上手くなったと実感してます。"],["cmsrgkimgmbt6","https://x.com/kokuren_1/status/2087644931913654673","骨架、動作","(無內文)"],["cmsr3fhojlvxr","https://www.threads.com/@comiclife08/post/Db9otY7E3KT","漫畫","「完稿檢測室」畫完才是漫畫的開始 — 2026漫畫創作線上課程， 第十堂課精簡筆記摘要😇 BARZ老師的課程摘錄， 這是本系列課程的最後一堂， BARZ老師以黑白漫畫的完稿為例， 舉了很多在完稿時的處理技巧， 尤其是整體畫面的景深層次處理， 收與放之間的取捨差異， 相信一定滿足"],["cmsr3fhnwvr4w","https://instagram.com/p/DavhTPfAd1b","服裝","Cloth rendering tutorial by @eladesuu_"],["cmsr2xzwtxcl5","https://instagram.com/p/Dbn1h_2jddS","光影","by @muzenik_tutorials ⠀"],["cmsr2xzvuxii5","https://www.instagram.com/reel/DaUpqL5gtud/","骨架、動作","Most artists miss this simple shape"],["cmsqavpr16o5k","https://www.threads.com/@paolinadual506/post/Dbc6wuJiJCx","繪圖技巧","圖層用法小妙方"],["cmsqapzsh1ioy","https://www.threads.com/@vampiry111/post/Db7z6WRjvHx","Procreate筆刷","正在準備了⛅️ procreate 雲筆刷！ 可以留言告訴我你還想要哪種類型的雲，我會盡力製作並收錄到這個筆刷集中，或者也可以許願希望我之後開發哪種筆刷～ 基本上都是一種筆刷用到底，全程都沒有換過色，筆刷自帶雙色效果和堆疊效果，完全是為自己的懶惰而誕生🌚 後續更新消息都會發佈在"],["cmsq5rz9wymyt","https://www.instagram.com/p/Db8QZKHiacq/","光影","色彩層次越多的圖，純黑色線會讓立體感下降 因為黑色是一種雙面刃 雖然最能吸引注意力 但也更容易增加色彩負擔 幫線條上色 整張圖繪更透亮！ 咖啡因的第一本教學書 《從零開始的日系角色入門》 開賣啦！ 實體書： 電子書："],["cmsq5rz8sobhy","https://x.com/fznutri/status/2086965296393253174","骨架、動作","Different face angles."],["cmsq1zh2y3pyd","https://x.com/mrsghoststudio/status/2086885512954954031","骨架、動作","Neck drawing tips ✍️ anatomydrawing"],["cmsq1zh2bhfd9","https://x.com/mk8h_art/status/2087137793898090693","骨架、動作","(無內文)"],["cmsq1zh1w0qkl","https://x.com/kokuren_1/status/2087264357138985404","骨架、動作","(無內文)"],["cmsq1zh0uivdd","https://www.instagram.com/reel/DZ-FOAihDfr/","骨架、動作","Common Beginner Mistakes When Drawing Portraits ✍️"],["cmsq1zgzteyo7","https://www.threads.com/@jyn_ixix/post/Db7ahljGAK2","繪圖技巧","有人問我是怎麼做到每天練習的， 我覺得要讓練習更永續性比起練習的方法是否有效來得更重要。盡量降低你和畫畫練習之間的阻力，例如不要畫太難的題材，把畫具都準備好，分別出一個畫畫的空間，這些都是有幫助的▓ 當然，若你愛上畫畫了，不是要逼自己畫多，反而要刻意的限制自己，否則眼睛、腰和手腕"],["cmsq1zgyxj81y","https://www.instagram.com/reel/DbziAW2DJEF/","服裝","金屬盔甲畫起來有夠帥，但沒畫好就容易變成灰色塑膠 😅 明明步驟都差不多：打底、分色、加深、上光⋯⋯ 但同樣的步驟，畫出來是「塑膠感」還是「金屬感」， 關鍵就在高光、反光，以及它們出現的位置。 33 秒拆給你看，老師怎麼處理這個關鍵細節。 留言告訴我們：你還想看老師處理哪種材質？"],["cmsq1zgyhbekk","https://www.instagram.com/reel/DbX5Hruu_m1/","Procreate筆刷","(無內文)","gone"],["cmsq1zgx53szk","https://www.threads.com/@muyan._.0320/post/Db2JlGek1-A","頭髮","這個地方到底怎麼畫啊啊啊啊"],["cmspk6c5jlt0n","https://www.threads.com/@t.tea_j/post/Db5_KT_kgef","骨架、動作","女性肌肉"],["cmspk6c4o3654","https://www.threads.com/@nazaya119/post/Db55DxbIxTF","Procreate筆刷",""],["cmsobw9b2l0l5","https://www.threads.com/@comiclife08/post/Db4f2Eak90O","漫畫","「完稿檢測室」畫完才是漫畫的開始 — 2026漫畫創作線上課程， 第九堂課精簡筆記摘要😇 小峱峱老師的課程摘錄， 老師分享了封面設計以及彩稿光影的技巧， 這堂課有別於其他課程， 不是以漫畫表演為主題， 而是以設計與圖像構成為主， 相信運用在漫畫上也是另一種思維， 尤其峱峱老師範"],["cmsobw995cz2p","https://www.instagram.com/reel/DbievGthgIF/","服裝","How to Paint Fabric Folds in 7 EASY Steps! (Kimono Rendering Tutorial) 📌 Original Video Link: 【 🎨 Artist: 像素喵喵 Translated from a Xiaohongs"],["cmso056qn5jr6","https://www.instagram.com/reel/DbzsR6TCLcs/","骨架、動作","Follow me."],["cmso056q5eu0g","https://www.instagram.com/reel/DaQVInAze8Y/","眼睛","Struggling with the 3/4 angle eye? Fix it with this 1 simple trick! 新手必學！超直觀的「平行四邊形」眼睛透視法，草履蟲都能學會！✨ 來自REDnote艺术家的教程 Id：6718177870"],["cmso056pnk8db","https://x.com/tatami_loop/status/2086796723180195844","速寫","正座の女性スケッチ 1minタイムラプス 手戻りを減らすコツは、開始3秒あたりの「角度と比率の補助線」かと。この場合は写真から比率を図るのではなく自分の知識の比率に当てはめて進めています。 参考資料：@grafit_studio GrafitStudioより、割引コードを再発行し"],["cmsnuy295kfqn","https://www.instagram.com/reel/DbnM2kPxp9B/","繪圖技巧","畫畫圖層模式用法"],["cmsnuy28rglxu","https://www.instagram.com/reel/DZ7vkIvNkU5/","骨架、動作","😭🤧"],["cmsnuy28cdger","https://www.instagram.com/reel/DZme9rtScMH/","繪圖技巧","破碎鏡子效果"],["cmsnuy27xkrh0","https://instagram.com/p/Da1StKgk2Y1","服裝","個人メモ：半袖を描くポイント ❇️Fanbox、Patreonで個人的な美術解剖学のメモをまとめています/プロフの直リンクをご参照ください ⬇️Tシャツのシワ：両腕の可動解説 FANBOX Patreon ■ENGLISH T-shirt folds and wrinkles:t"],["cmsn6h12d7ptv","https://www.facebook.com/reel/2912589422411056/","光影","頭像二分畫法，人臉二分怎么畫 頭像二分光影畫法來了，頭像怎么畫二分"],["cmsn6h11rnrti","https://www.facebook.com/reel/1007040005565681/","骨架、動作","How to draw arms using the Triangle Method"],["cmsn5kr89xgmh","https://instagram.com/p/DbVearfD4lW","骨架、動作","손목의 두께는 검지, 중지, 약지 세 손가락의 너비와 비슷하다."],["cmsmr82mtf3xs","https://instagram.com/p/DbppbGBk1Vo","骨架、動作","手臂畫法（收徒中）"],["cmsmr82meu3zi","https://instagram.com/p/Dbfm1nQEzhX","骨架、動作","人體繪畫-手"],["cmsmr82lu7efj","https://instagram.com/p/DbdbgJajVg9","服裝","by GY_ANIFORCE1 (X) ⠀"],["cmsmpyxkcuykl","https://instagram.com/p/Dbu221RNp36","骨架、動作","by maealgae1 (X) ⠀"],["cmsm0e4mgoy10","https://www.facebook.com/reel/1031222732597366/","速寫","【色彩速涂】防止摳細節的最好方法是不畫細節"],["cmsm0e4loivyx","https://www.facebook.com/reel/5433990956826862/","背景參考","畫植物場景教程"],["cmsm0e4l4wxqf","https://www.facebook.com/reel/1352461423580952/","骨架、動作","超簡單的手臂肌肉速記，簡簡單單啦"],["cmsm0e4kqfz37","https://www.facebook.com/reel/28146112234996141/","光影","兩張圖搞明白兩種上色風格的不同"],["cmsm0e4kb0ghq","https://www.facebook.com/reel/2519376071829050/","速寫","今天分享的內容是 我會怎麼做練習的目的與抉擇 小稿為什麼重要? 因為小稿能幫助你照顧整體的大關係 並且更有效益的做出畫面的取捨~ 甚麼是想要保留下來的重點，甚麼是可以省去不理的 藉此提升我畫面的控制能力"],["cmsm0e4jlycaf","https://www.facebook.com/reel/1035728582186837/","光影","procreate懶人藏色畫出五彩斑斕的白"],["cmslontd572kq","https://instagram.com/p/DbaFutgE1P4","骨架、動作","大腿結構"],["cmsl77kf37mhr","https://www.facebook.com/reel/1286546630293604/","骨架、動作","腰臀腿到底要怎麼連接才合適 作者：龍二繪畫"],["cmsl77kep4y0e","https://instagram.com/p/DaxK-Sqk1SN","光影","上色處理…"],["cmsl77ke9k6yj","https://instagram.com/p/DbF2AH6E7Jm","眼睛","眼睛教程來來來！"],["cmsl77kdpq3o6","https://instagram.com/p/DbnD2BPE0Jt","骨架、動作","臀部結構！"],["cmsj24cipeo22","https://www.threads.com/@jumjum._.jumjum/post/DajiIDzEvUC","繪圖技巧","你們畫布都開多大啊 為什麼大佬畫布再怎麼放大都不會糊"],["cmsj24cg7gpqu","https://www.threads.com/@raven_128_/post/DarzjSllHr0","Procreate筆刷","兩百萬人看過的Procreate描邊筆分享～！"],["cmsj24cezbyek","https://www.threads.com/@nima570216/post/Da5tisgk2Iz","背景參考","剛剛發現了好玩的東西，畫背景的有福了"],["cmsj042ju6p67","https://www.threads.com/@ylc0216/post/DbvJBe6kQWa","背景參考","捷運上遇見的景色 真的好美😍"],["cmsiyl5phpp74","https://www.threads.com/@webber1016liu/post/DbvLGd6E1R4","背景參考","颱風前的台北出大景啦！超美的火燒雲和霞光"],["cmsifnadbjot2","https://www.facebook.com/reel/3207979759590881/","繪圖技巧","厚涂教程之懶人大妙招！"],["cmsifnacphcqv","https://www.threads.com/@jian930304/post/Dbs4O6EAX5s","背景參考","我在屏東的午後拍到了這個畫面，美到起雞皮疙瘩..."],["cmsfwwd8riq1o","https://threads.com/@mon_511312/post/Dbo-lC0E2vz","眼睛","之前有做了簡單的眼睛繪製技巧 希望能幫助到你👍👍"],["cmsfnnyfnodjn","https://threads.com/@mangui.0111/post/DbpHEgnk_YH","骨架、動作","這真的屌爆了！！！ 絕對是每個畫畫人的福音 超級好用！"],["cmsex5l7se0r5","https://www.threads.com/@hsuevan1215/post/DbmwNealPvz","背景參考","充滿節奏感的都市畫面"]];
 
 /* Units: suggested learning order (this page's arrangement, not the creators'). */
 const UNITS = [
@@ -465,21 +715,47 @@ function visible(){
   return out.map(x=>x.l);
 }
 
+/* ---------- ui helpers ---------- */
+const NS="http://www.w3.org/2000/svg";
+function ic(n,cls){const s=document.createElementNS(NS,"svg");s.setAttribute("class","i"+(cls?" "+cls:""));s.setAttribute("aria-hidden","true");const u=document.createElementNS(NS,"use");u.setAttribute("href","#i-"+n);s.appendChild(u);return s;}
+function setBtn(b,icon,text){b.textContent="";if(icon)b.appendChild(ic(icon));b.appendChild(el("span",{class:"lbl",text}));}
+const PCLS={Instagram:"ig",Facebook:"fb",X:"x",Threads:"th"};
+function toast(text,type){
+  const box=$("#toasts");const t=el("div",{class:"toast "+(type||"ok"),role:type==="err"?"alert":"status"},[ic(type==="err"?"alert":"check-c"),el("span",{text})]);
+  box.appendChild(t);while(box.children.length>3)box.firstChild.remove();
+  setTimeout(()=>t.remove(),type==="err"?6000:3200);
+}
+
 /* ---------- render ---------- */
 function renderProgress(){
   const n=LESSONS.length;let d=0,g=0;
   LESSONS.forEach(l=>{const s=st(l.id);if(s==="done")d++;else if(s==="doing")g++;});
   const nums=$("#nums");nums.textContent="";
-  [["共",n,"堂"],["已完成",d,"堂"],["練習中",g,"堂"],["待學習",n-d-g,"堂"]].forEach(([a,b,c])=>{nums.appendChild(el("span",{},[document.createTextNode(a+" "),el("b",{text:String(b)}),document.createTextNode(" "+c)]));});
+  [["total","共",n],["done","已完成",d],["doing","練習中",g],["todo","待學習",n-d-g]].forEach(([c,a,b])=>{
+    nums.appendChild(el("span",{class:"stat "+c},[c!=="total"?el("i",{class:"dot"}):null,document.createTextNode(a+" "),el("b",{text:String(b)}),document.createTextNode(" 堂")]));});
   $("#barDone").style.width=(d/n*100)+"%";$("#barDoing").style.width=(g/n*100)+"%";
+}
+function unitButtons(box,onPick){
+  box.textContent="";
+  const mk=(key,name,list)=>{
+    const dn=list.filter(l=>st(l.id)==="done").length;
+    const b=el("button",{type:"button","aria-pressed":String(fUnit===key)},[
+      el("span",{class:"nm",text:name}),el("span",{class:"ct",text:dn?`${dn}/${list.length}`:String(list.length)}),
+      (()=>{const m=el("span",{class:"mini","aria-hidden":"true"});const i=el("i");i.style.width=(dn/list.length*100)+"%";m.appendChild(i);return m;})()]);
+    b.setAttribute("aria-label",`${name}，${list.length} 堂，已完成 ${dn} 堂`);
+    b.onclick=()=>{fUnit=key;persistView();render();if(onPick)onPick();};
+    box.appendChild(b);
+  };
+  mk("all","全部單元",LESSONS);
+  UNITS.forEach(u=>mk(u.cat,u.name,LESSONS.filter(l=>l.cat===u.cat)));
 }
 function renderControls(){
   const seg=$("#seg");seg.textContent="";
   STATUS.forEach(([k,lab])=>{const b=el("button",{type:"button","aria-pressed":String(fStatus===k),text:lab});b.onclick=()=>{fStatus=k;persistView();render();};seg.appendChild(b);});
-  const mods=$("#mods");mods.textContent="";
-  const allB=el("button",{type:"button","aria-pressed":String(fUnit==="all")},[document.createTextNode("全部單元 "),el("small",{text:String(LESSONS.length)})]);
-  allB.onclick=()=>{fUnit="all";persistView();render();};mods.appendChild(allB);
-  UNITS.forEach((u,i)=>{const c=LESSONS.filter(l=>l.cat===u.cat).length;const b=el("button",{type:"button","aria-pressed":String(fUnit===u.cat)},[document.createTextNode(u.name+" "),el("small",{text:String(c)})]);b.onclick=()=>{fUnit=u.cat;persistView();render();};mods.appendChild(b);});
+  unitButtons($("#mods"));
+  unitButtons($("#modsM"),()=>$("#unitDialog").close());
+  const u=UNITS.find(x=>x.cat===fUnit);$("#unitBtnLbl").textContent=u?u.name:"全部單元";
+  $("#unitBtn").setAttribute("aria-pressed",String(!!u));
 }
 function persistView(){try{sessionStorage.setItem("drawcourse.view",JSON.stringify({s:fStatus,u:fUnit}));}catch(e){}}
 let current=[];
@@ -490,38 +766,61 @@ function render(){
   $("#clearQ").hidden=!query;
   const list=$("#list");list.textContent="";
   if(!current.length){
-    const box=el("div",{class:"empty"},[el("p",{text:query?`找不到和「${query}」有關的課。試試更短的詞，例如「手」「線稿」「光」，或清除篩選。`:"這個篩選目前沒有課程。"})]);
-    const b=el("button",{class:"btn",type:"button",text:"清除搜尋與篩選"});b.onclick=()=>{query="";$("#q").value="";fStatus="all";fUnit="all";persistView();render();};
-    box.appendChild(b);list.appendChild(box);return;
+    const box=el("div",{class:"card empty"},[
+      el("div",{class:"empty-ic"},[ic("search")]),
+      el("h2",{text:query?`找不到和「${query}」有關的課`:"這個篩選目前沒有課程"}),
+      el("p",{text:query?"試試更短或更一般的詞，或清除篩選後再搜尋。":"換一個學習狀態或單元，或清除所有篩選。"})]);
+    const b=el("button",{class:"btn btn-primary",type:"button",text:"清除搜尋與篩選"});
+    b.onclick=()=>{query="";$("#q").value="";fStatus="all";fUnit="all";persistView();render();};
+    box.appendChild(b);
+    if(query){const sg=el("div",{class:"sugg"},[el("span",{text:"或試試："})]);
+      ["手","線稿","光影","眼睛"].forEach(w=>{const c=el("button",{class:"chip",type:"button",text:w});c.onclick=()=>runQuery(w);sg.appendChild(c);});box.appendChild(sg);}
+    list.appendChild(box);return;
   }
   if(query){
-    const sec=el("section",{class:"unit","aria-labelledby":"uq"});
-    sec.appendChild(el("div",{class:"unit-head"},[el("span",{class:"no",text:"搜尋"}),el("h2",{id:"uq",text:`「${query}」的相關課程`}),el("span",{class:"meta",text:"最相關的在前"})]));
+    const sec=el("section",{class:"card unit","aria-labelledby":"uq"});
+    sec.appendChild(el("div",{class:"unit-head"},[el("div",{class:"hd"},[el("div",{class:"unit-no",text:"搜尋結果"}),el("h2",{id:"uq",text:`「${query}」的相關課程`}),el("p",{class:"unit-desc",text:"最相關的排在前面"})])]));
     const ol=el("ol",{class:"lessons"});
-    current.forEach(l=>ol.appendChild(el("li",{},[lessonRow(l,true)])));
+    current.forEach(l=>ol.appendChild(lessonRow(l,true)));
     sec.appendChild(ol);list.appendChild(sec);return;
   }
   UNITS.forEach((u,ui)=>{
     const ls=current.filter(l=>l.cat===u.cat);if(!ls.length)return;
     const all=LESSONS.filter(l=>l.cat===u.cat);const dn=all.filter(l=>st(l.id)==="done").length;
-    const sec=el("section",{class:"unit","aria-labelledby":"u"+ui});
-    sec.appendChild(el("div",{class:"unit-head"},[el("span",{class:"no",text:"單元 "+String(ui+1).padStart(2,"0")}),el("h2",{id:"u"+ui,text:u.name}),el("span",{class:"meta",text:`${dn}/${all.length} 完成`})]));
-    sec.appendChild(el("p",{class:"unit-desc",text:u.desc}));
+    const sec=el("section",{class:"card unit","aria-labelledby":"u"+ui});
+    sec.appendChild(el("div",{class:"unit-head"},[
+      el("div",{class:"hd"},[el("div",{class:"unit-no",text:"單元 "+String(ui+1).padStart(2,"0")}),el("h2",{id:"u"+ui,text:u.name}),el("p",{class:"unit-desc",text:u.desc})]),
+      el("span",{class:"badge unit-meta"+(dn===all.length?" badge-success":""),"data-unit":u.cat,text:`${dn}/${all.length} 完成`})]));
     const ol=el("ol",{class:"lessons"});
-    ls.forEach(l=>ol.appendChild(el("li",{},[lessonRow(l,false)])));
+    ls.forEach(l=>ol.appendChild(lessonRow(l,false)));
     sec.appendChild(ol);list.appendChild(sec);
   });
 }
+const NEXT_S={todo:"doing",doing:"done",done:"todo"};
 function lessonRow(l,showUnit){
   const s=st(l.id);
-  const meta=(showUnit?l.unit.name+"・":"")+`${l.platform}・${l.kind}`+(note(l.id)?"・有筆記":"");
+  const meta=el("span",{class:"meta"});
+  if(showUnit)meta.appendChild(el("span",{text:l.unit.name}));
+  meta.appendChild(el("span",{class:"badge"+(l.kind==="影片"?" badge-primary":"")},[ic(l.kind==="影片"?"video":"image","i-sm"),document.createTextNode(l.kind)]));
+  meta.appendChild(el("span",{text:l.platform}));
+  if(l.gone)meta.appendChild(el("span",{class:"badge badge-warning",text:"已失效"}));
+  if(!l.known)meta.appendChild(el("span",{class:"badge",text:"未命名"}));
+  if(note(l.id))meta.appendChild(el("span",{},[ic("note","i-sm"),document.createTextNode(" 有筆記")]));
   const b=el("button",{class:"lesson",type:"button"},[
     el("span",{class:"n",text:String(l.no)}),
-    el("span",{class:"t"},[el("b",{class:l.known?"":"unknown",text:l.title}),el("span",{text:meta})]),
-    el("span",{class:"pill "+s,text:SL[s]})
+    el("span",{class:"plat p-"+(PCLS[l.platform]||"x"),"aria-hidden":"true"},[ic("p-"+(PCLS[l.platform]||"x"))]),
+    el("span",{class:"t"},[el("b",{text:l.known?l.title:`${l.platform}${l.kind}`}),meta])
   ]);
   b.onclick=()=>openLesson(l.id,b);
-  return b;
+  const p=el("button",{class:"pill "+s,type:"button",text:SL[s]});
+  p.setAttribute("aria-label",`${l.known?l.title:l.platform+l.kind}：${SL[s]}，按一下改成「${SL[NEXT_S[s]]}」`);
+  p.onclick=()=>{const n=NEXT_S[st(l.id)];if(setP(l.id,{s:n})){const row=lessonRow(l,showUnit);li.replaceWith(row);row.querySelector(".pill").focus();refreshCounts();toast(`已標記為「${SL[n]}」`);}};
+  const li=el("li",{class:"row"},[b,p]);
+  return li;
+}
+function refreshCounts(){
+  renderProgress();unitButtons($("#mods"));unitButtons($("#modsM"),()=>$("#unitDialog").close());
+  document.querySelectorAll(".unit-meta[data-unit]").forEach(m=>{const all=LESSONS.filter(l=>l.cat===m.dataset.unit);const dn=all.filter(l=>st(l.id)==="done").length;m.textContent=`${dn}/${all.length} 完成`;m.classList.toggle("badge-success",dn===all.length);});
 }
 
 /* ---------- lesson sheet ---------- */
@@ -535,10 +834,10 @@ function loadTwitter(){
 }
 const MKEY="drawcourse.mute";
 let fbMute=false;try{fbMute=localStorage.getItem(MKEY)==="1";}catch(e){}
-let fbPlayer=null,fbTarget=null,fbSdk=null,stopped=false,forceLoad=false;
+let fbPlayer=null,fbTarget=null,fbSdk=null,fbDone=null,stopped=false,forceLoad=false;
 const QKEY="drawcourse.quiet";let quiet=false;try{quiet=localStorage.getItem(QKEY)==="1";}catch(e){}
-function syncQuiet(){const b=$("#quietBtn");b.setAttribute("aria-checked",String(quiet));b.textContent=quiet?"🔕 安靜模式：開":"🔔 安靜模式：關";
-  $("#quietNote").textContent=quiet?"課程不會載入影片播放器，只顯示文字和「打開原文」；需要時可在課程裡單獨播放。":"開啟後，課程不載入播放器，完全不會有聲音。";}
+function syncQuiet(){const b=$("#quietBtn");b.setAttribute("aria-checked",String(quiet));setBtn(b,quiet?"bell-off":"bell",quiet?"安靜模式：開":"安靜模式");
+  b.title=quiet?"安靜模式開啟中：課程不會載入影片播放器":"開啟安靜模式：課程不載入播放器，完全不會有聲音";}
 function isFbVideo(l){return !!(l.embed&&!l.embed.tweet&&/facebook\.com\/(reel\/|[^/]+\/videos\/)/.test(l.src));}
 function iframeFor(l){return el("iframe",{src:l.embed.src,title:l.title+"（"+l.platform+"）",style:"height:"+l.embed.h+"px",allow:"autoplay; encrypted-media; picture-in-picture; fullscreen",allowfullscreen:"",loading:"lazy",referrerpolicy:"strict-origin-when-cross-origin"});}
 let igPromise=null;
@@ -554,49 +853,64 @@ function loadFb(){
   // Instagram 的 embed.js 必須比 Facebook SDK 先載入，否則會失效
   if(!fbSdk)fbSdk=loadIg().catch(()=>{}).then(()=>new Promise((res,rej)=>{
     window.fbAsyncInit=()=>{FB.init({xfbml:false,version:"v23.0"});
-      FB.Event.subscribe("xfbml.ready",m=>{if(m.type!=="video"||!fbTarget||(m.id&&m.id!==fbTarget))return;fbPlayer=m.instance;if(fbMute){try{fbPlayer.mute();}catch(e){}}});
+      FB.Event.subscribe("xfbml.ready",m=>{if(m.type!=="video"||!fbTarget||(m.id&&m.id!==fbTarget))return;fbPlayer=m.instance;if(fbMute){try{fbPlayer.mute();}catch(e){}}if(fbDone){fbDone();fbDone=null;}});
       res(FB);};
     const sc=document.createElement("script");sc.src="https://connect.facebook.net/zh_TW/sdk.js";sc.async=true;sc.crossOrigin="anonymous";
     sc.onerror=()=>{fbSdk=null;sc.remove();rej();};document.body.appendChild(sc);setTimeout(rej,10000);}));
   return fbSdk;
 }
-function clearPlayer(){$("#sPlayer").textContent="";fbPlayer=null;fbTarget=null;}
+function clearPlayer(){$("#sPlayer").textContent="";fbPlayer=null;fbTarget=null;fbDone=null;}
+function loader(pl,text){
+  const b=el("div",{class:"pl-loading",role:"status"},[el("span",{class:"spinner","aria-hidden":"true"}),el("span",{text})]);
+  pl.prepend(b);const t=setTimeout(done,20000);
+  function done(){clearTimeout(t);b.remove();}
+  return done;
+}
+function plMsg(icon,title,text,err){return el("div",{class:"pl-msg gone"+(err?" err":"")},[el("div",{class:"ic"},[ic(icon)]),el("b",{text:title}),el("p",{text})]);}
 function renderPlayer(l){
   const pl=$("#sPlayer");clearPlayer();const id=l.id;
-  if(l.gone){pl.appendChild(el("p",{class:"gone",text:`${l.platform} 回報這則貼文已不存在或無法公開觀看（可能已被作者刪除），所以無法播放。`}));return;}
+  if(l.gone){pl.appendChild(plMsg("alert","這則貼文已無法觀看",`${l.platform} 回報這則貼文已不存在或無法公開觀看（可能已被作者刪除），所以無法播放。`,true));return;}
   if(!l.embed)return;
-  if(quiet&&!forceLoad){pl.appendChild(el("div",{class:"quietbox"},[el("p",{text:"安靜模式開啟中，這堂課沒有載入播放器。"}),(()=>{const b=el("button",{class:"btn",type:"button",text:"▶ 只播放這一堂"});b.addEventListener("click",()=>{forceLoad=true;renderPlayer(l);updateCtl(l);});return b;})()]));return;}
-  if(l.embed.tweet){const box=el("div",{class:"tweet"});pl.appendChild(box);
-    loadTwitter().then(tw=>{if(openId!==id)return;return tw.widgets.createTweet(l.embed.tweet,box,{lang:"zh-tw",dnt:true,align:"center"}).then(r=>{if(!r&&openId===id)box.appendChild(el("p",{class:"gone",text:"X 沒有顯示這則貼文（可能已刪除或設為私人），請用下方按鈕到 X 打開。"}));});})
-      .catch(()=>{if(openId===id)box.appendChild(el("p",{class:"gone",text:"X 播放器載入失敗，請用下方按鈕到 X 打開。"}));});}
+  if(quiet&&!forceLoad){
+    const b=el("button",{class:"btn btn-primary",type:"button"});setBtn(b,"play","只播放這一堂");
+    b.addEventListener("click",()=>{forceLoad=true;renderPlayer(l);updateCtl(l);});
+    pl.appendChild(el("div",{class:"quietbox"},[el("div",{class:"ic"},[ic("bell-off")]),el("b",{text:"安靜模式開啟中"}),el("p",{text:"這堂課沒有載入播放器，不會有任何聲音。"}),b]));
+    return;}
+  const fail=t=>pl.appendChild(plMsg("alert","播放器載入失敗",t,true));
+  if(l.embed.tweet){const box=el("div",{class:"tweet"});pl.appendChild(box);const done=loader(pl,"X 播放器載入中…");
+    loadTwitter().then(tw=>{if(openId!==id)return;return tw.widgets.createTweet(l.embed.tweet,box,{lang:"zh-tw",dnt:true,align:"center"}).then(r=>{done();if(!r&&openId===id){box.remove();fail("X 沒有顯示這則貼文（可能已刪除或設為私人），請用「打開原文」到 X 觀看。");}});})
+      .catch(()=>{done();if(openId===id){box.remove();fail("X 播放器載入失敗，請用「打開原文」到 X 觀看。");}});}
   else if(l.embed.ig){
     const box=el("div",{class:"igbox"});const bq=el("blockquote",{class:"instagram-media","data-instgrm-permalink":l.embed.ig+"?utm_source=ig_embed","data-instgrm-version":"14"});
-    box.appendChild(bq);pl.appendChild(box);
-    const fallback=()=>{if(openId!==id||!box.isConnected)return;const f=box.querySelector("iframe");if(!f||f.offsetHeight<60)box.replaceWith(iframeFor(l));};
+    box.appendChild(bq);pl.appendChild(box);const done=loader(pl,"Instagram 播放器載入中…");
+    const poll=setInterval(()=>{if(openId!==id||!box.isConnected){clearInterval(poll);return;}const f=box.querySelector("iframe");if(f&&f.offsetHeight>60){clearInterval(poll);done();}},300);
+    const fallback=()=>{clearInterval(poll);if(openId!==id||!box.isConnected)return;const f=box.querySelector("iframe");if(!f||f.offsetHeight<60){const fr=iframeFor(l);fr.addEventListener("load",done);box.replaceWith(fr);}else done();};
     loadIg().then(ig=>{if(openId!==id||!box.isConnected)return;ig.Embeds.process();setTimeout(fallback,8000);}).catch(fallback);
   }
   else if(isFbVideo(l)){
     const vid="fbv"+Date.now();fbTarget=vid;const box=el("div",{class:"fbbox"});pl.appendChild(box);
+    const done=loader(pl,"Facebook 播放器載入中，大約需要 10 秒…");fbDone=done;
     loadFb().then(FB=>{if(openId!==id||fbTarget!==vid)return;
       const w=Math.round(Math.min(500,Math.max(240,pl.clientWidth-2)));
       box.appendChild(el("div",{class:"fb-video",id:vid,"data-href":l.src,"data-width":String(w),"data-show-text":"false","data-allowfullscreen":"true"}));FB.XFBML.parse(box);})
-    .catch(()=>{if(openId===id&&fbTarget===vid){fbTarget=null;box.replaceWith(iframeFor(l));updateCtl(l);}});
+    .catch(()=>{if(openId===id&&fbTarget===vid){fbTarget=null;fbDone=null;const fr=iframeFor(l);fr.addEventListener("load",done);box.replaceWith(fr);updateCtl(l);}});
   }
-  else pl.appendChild(iframeFor(l));
+  else{const fr=iframeFor(l);pl.appendChild(fr);const done=loader(pl,`${l.platform} 播放器載入中…`);fr.addEventListener("load",done);}
 }
 function updateCtl(l){
   const has=!!(l&&l.embed&&!l.gone&&!(quiet&&!forceLoad));$("#sCtl").hidden=!has;if(!has)return;
-  $("#sStop").textContent=stopped?"▶ 重新載入播放器":"■ 停止播放";
+  setBtn($("#sStop"),stopped?"play":"stop",stopped?"重新載入播放器":"停止播放");
   const fb=isFbVideo(l),m=$("#sMute");m.hidden=!fb;
-  m.setAttribute("aria-pressed",String(fbMute));m.textContent=fbMute?"🔇 Facebook 靜音：開":"🔈 Facebook 靜音：關";
+  m.setAttribute("aria-pressed",String(fbMute));setBtn(m,fbMute?"vol-x":"vol",fbMute?"Facebook 靜音：開":"Facebook 靜音：關");
   $("#sCtlNote").textContent=stopped?"播放器已移除，聲音已停止。":
     fb?(fbTarget===null&&!fbPlayer&&$("#sPlayer iframe")?"Facebook 靜音工具沒載入成功，請按播放器裡的喇叭圖示，或按「停止播放」。":(fbMute?"Facebook 影片會以靜音播放，再按一次就恢復聲音。這個設定會記住。":"按「Facebook 靜音」可讓這類影片不出聲，這個設定會記住。"))
       :`${l.platform} 不開放網站控制音量：要關聲音請按「停止播放」，或按播放器裡的喇叭圖示。`;
 }
 syncQuiet();
-$("#quietBtn").addEventListener("click",()=>{quiet=!quiet;try{localStorage.setItem(QKEY,quiet?"1":"0");}catch(e){}syncQuiet();});
+$("#quietBtn").addEventListener("click",()=>{quiet=!quiet;try{localStorage.setItem(QKEY,quiet?"1":"0");}catch(e){}syncQuiet();
+  toast(quiet?"安靜模式已開啟：課程不會載入影片播放器，需要時可在課程裡單獨播放。":"安靜模式已關閉：課程會自動載入播放器。");});
 $("#sStop").addEventListener("click",()=>{const l=LESSONS.find(x=>x.id===openId);if(!l)return;
-  if(stopped){stopped=false;renderPlayer(l);}else{stopped=true;clearPlayer();$("#sPlayer").appendChild(el("p",{class:"gone",text:"已停止播放。"}));}updateCtl(l);});
+  if(stopped){stopped=false;renderPlayer(l);}else{stopped=true;clearPlayer();$("#sPlayer").appendChild(plMsg("stop","已停止播放","播放器已移除，不會再有聲音。按「重新載入播放器」可以再看一次。"));}updateCtl(l);});
 $("#sMute").addEventListener("click",()=>{fbMute=!fbMute;try{localStorage.setItem(MKEY,fbMute?"1":"0");}catch(e){}
   const p=fbPlayer;if(p){try{fbMute?p.mute():p.unmute();}catch(e){}}
   updateCtl(LESSONS.find(x=>x.id===openId));
@@ -604,14 +918,16 @@ $("#sMute").addEventListener("click",()=>{fbMute=!fbMute;try{localStorage.setIte
 function openLesson(id,from){
   const l=LESSONS.find(x=>x.id===id);if(!l)return;
   openId=id;if(from)returnFocus=from;
-  $("#sCrumb").textContent=`單元 ${String(l.unit.idx+1).padStart(2,"0")}・${l.unit.name}・第 ${l.no} 堂`;
-  $("#sTitle").textContent=l.title;
+  const cr=$("#sCrumb");cr.textContent="";
+  cr.appendChild(el("b",{text:"單元 "+String(l.unit.idx+1).padStart(2,"0")}));cr.appendChild(el("span",{text:`${l.unit.name}・第 ${l.no} 堂`}));
+  cr.appendChild(el("span",{class:"badge"+(l.kind==="影片"?" badge-primary":""),text:`${l.platform}${l.kind}`}));
+  $("#sTitle").textContent=l.known?l.title:`${l.platform}${l.kind}（未命名）`;
   stopped=false;forceLoad=false;renderPlayer(l);updateCtl(l);
-  const a=$("#sOpen");a.href=l.src;a.textContent=`在 ${l.platform} 打開原文 ↗`;
-  $("#sOpenNote").textContent=l.gone?"原連結保留在這裡，你可以自己確認。":`播放器空白、要求登入或顯示無法播放時，按上方按鈕到 ${l.platform} 觀看。原文若已刪除或設為私人，兩邊都看不到。`;
+  const a=$("#sOpen");a.href=l.src;a.textContent="";a.appendChild(ic("ext"));a.appendChild(document.createTextNode(`在 ${l.platform} 打開原文`));
+  $("#sOpenNote").textContent=l.gone?"原連結保留在這裡，你可以自己確認。":`播放器空白、要求登入或無法播放時，按上方按鈕到 ${l.platform} 觀看。`;
   $("#sSrc").textContent=l.txt&&l.txt!=="(無內文)"?l.txt:"（收藏裡沒有內文）";
   $("#sEvidence").textContent=(l.known?"課名取自收藏內文；這個頁面沒有逐一看過影片，所以不列操作步驟。":"收藏裡沒有可用的文字，看完播放器後可以在筆記裡記下它在教什麼。")+" 收藏內文最多擷取約 140 字。";
-  const tg=$("#sTags");tg.textContent="";[l.unit.name,...l.tags].forEach(t=>tg.appendChild(el("span",{text:t})));
+  const tg=$("#sTags");tg.textContent="";[l.unit.name,...l.tags].forEach(t=>tg.appendChild(el("span",{class:"badge",text:t})));
   $("#sEx").textContent=l.unit.ex;$("#sCrit").textContent="完成標準："+l.unit.crit;
   syncStatus();
   $("#note").value=note(id);$("#noteMsg").textContent="";$("#noteMsg").className="msg";
@@ -619,7 +935,7 @@ function openLesson(id,from){
   $("#sPrev").disabled=i<=0;$("#sNext").disabled=i<0||i>=current.length-1;
   $("#scrim").classList.add("open");$("#sheet").classList.add("open");
   document.body.style.overflow="hidden";
-  $("#sheet .sheet-body").scrollTop=0;
+  document.querySelectorAll("#sheet .sheet-body, #sheet .col").forEach(x=>x.scrollTop=0);
   $("#sClose").focus();
 }
 function syncStatus(){
@@ -634,28 +950,45 @@ function closeLesson(){
 }
 function flushNote(){
   if(!openId)return;clearTimeout(noteTimer);
-  const v=$("#note").value;if(v!==note(openId)){if(setP(openId,{n:v})){$("#noteMsg").textContent="已儲存在這個瀏覽器";$("#noteMsg").className="msg ok";}}
+  const v=$("#note").value;if(v!==note(openId)){if(setP(openId,{n:v})){const m=$("#noteMsg");m.textContent="";m.appendChild(ic("check","i-sm"));m.appendChild(document.createTextNode("已儲存"));m.className="msg ok";}}
 }
-document.querySelectorAll("#sStatus button").forEach(b=>b.onclick=()=>{setP(openId,{s:b.dataset.s});syncStatus();renderProgress();});
+document.querySelectorAll("#sStatus button").forEach(b=>b.onclick=()=>{if(setP(openId,{s:b.dataset.s})){syncStatus();renderProgress();toast(`已標記為「${SL[b.dataset.s]}」`);}});
 $("#note").addEventListener("input",()=>{clearTimeout(noteTimer);$("#noteMsg").textContent="";noteTimer=setTimeout(flushNote,600);});
 $("#sClose").onclick=closeLesson;$("#scrim").onclick=closeLesson;
 function step(d){flushNote();const i=current.findIndex(x=>x.id===openId);const n=current[i+d];if(n)openLesson(n.id);}
 $("#sPrev").onclick=()=>step(-1);$("#sNext").onclick=()=>step(1);
+const typing=t=>t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.isContentEditable);
 document.addEventListener("keydown",e=>{
-  if(!openId)return;
-  if(e.key==="Escape"){e.preventDefault();closeLesson();}
-  if(e.key==="Tab"){const f=[...$("#sheet").querySelectorAll("a[href],button:not([disabled]),textarea")];const a=f[0],z=f[f.length-1];
+  if(document.querySelector("dialog[open]"))return;
+  if(!openId){
+    if(e.key==="/"&&!typing(e.target)&&!e.ctrlKey&&!e.metaKey){e.preventDefault();$("#q").focus();$("#q").select();}
+    return;
+  }
+  if(e.key==="Escape"){e.preventDefault();closeLesson();return;}
+  if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&!typing(e.target)&&!e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();step(e.key==="ArrowLeft"?-1:1);return;}
+  if(e.key==="Tab"){const f=[...$("#sheet").querySelectorAll("a[href],button:not([disabled]),textarea,summary")].filter(x=>x.offsetParent!==null);const a=f[0],z=f[f.length-1];
     if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}}
 });
 
+/* ---------- dialogs ---------- */
+document.querySelectorAll("dialog").forEach(d=>{
+  d.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>d.close());
+  d.addEventListener("click",e=>{if(e.target===d)d.close();});
+});
+$("#unitBtn").onclick=()=>{$("#unitDialog").showModal();const p=$("#modsM [aria-pressed=true]");if(p)p.focus();};
+$("#recBtn").onclick=()=>{$("#recDialog").showModal();};
+$("#brand").onclick=e=>{e.preventDefault();scrollTo({top:0,behavior:"smooth"});};
+
 /* ---------- search ---------- */
 let qt=null;
+function runQuery(q){query=q;$("#q").value=q;fUnit="all";persistView();render();scrollTo({top:0});}
 $("#q").addEventListener("input",e=>{clearTimeout(qt);qt=setTimeout(()=>{query=e.target.value.trim();render();},120);});
+$("#q").addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#q").value){e.preventDefault();$("#clearQ").click();}});
 $("#clearQ").onclick=()=>{query="";$("#q").value="";render();$("#q").focus();};
-QUICK.forEach(q=>{const b=el("button",{type:"button",text:q});b.onclick=()=>{query=q;$("#q").value=q;fUnit="all";persistView();render();};$("#qs").appendChild(b);});
+QUICK.forEach(q=>{const b=el("button",{class:"chip",type:"button",text:q});b.onclick=()=>runQuery(q);$("#qs").appendChild(b);});
 
 /* ---------- export / import ---------- */
-function showMsg(t,err){const m=$("#msg");m.textContent=t;m.className="msg "+(err?"err":"ok");}
+function showMsg(t,err){const m=$("#msg");m.textContent=t;m.className="msg "+(err?"err":"ok");toast(t,err?"err":"ok");}
 $("#exportBtn").onclick=async()=>{
   const data=JSON.stringify({app:"drawcourse",version:1,exported:new Date().toISOString(),progress:store.progress});
   $("#io").value=data;
@@ -676,7 +1009,7 @@ $("#importBtn").onclick=()=>{
 };
 
 render();
-if(!storageOK) showMsg("這個瀏覽器目前無法儲存進度。可以照常看課，但記得用「複製紀錄」保存。",true);
+if(!storageOK) showMsg("這個瀏覽器目前無法儲存進度。可以照常看課，但記得用「學習紀錄」裡的「複製紀錄」保存。",true);
 </script>
 </body>
 </html>
