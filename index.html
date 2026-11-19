@@ -297,7 +297,7 @@ li.row:hover{background:var(--surface-2)}
 .pl-msg.err .ic{background:var(--danger-soft);color:var(--danger)}
 .pl-msg b,.quietbox b{font-size:var(--fs-md)}
 .pl-msg p,.quietbox p{margin:0;color:var(--text-2);font-size:var(--fs-sm);max-width:42ch}
-.quietbox .btn{margin-top:var(--s2)}
+.quietbox .btn,.pl-msg .btn{margin-top:var(--s2)}
 .pctl{display:grid;gap:var(--s2)}
 .pbtns{display:flex;gap:var(--s2);flex-wrap:wrap}
 .pbtns .btn{flex:1 1 160px}
@@ -629,6 +629,7 @@ function embedOf(u){
   if((m=u.match(/instagram\.com\/(p|reel)\/([\w-]+)/))) return {ig:`https://www.instagram.com/${m[1]}/${m[2]}/`,src:`https://www.instagram.com/${m[1]}/${m[2]}/embed/`,h:m[1]==="reel"?880:760};
   if((m=u.match(/threads\.(?:com|net)\/(@[\w.]+)\/post\/([\w-]+)/))) return {src:`https://www.threads.com/${m[1]}/post/${m[2]}/embed`,h:560};
   if((m=u.match(/(?:x|twitter)\.com\/[\w]+\/status\/(\d+)/))) return {tweet:m[1],h:560};
+  if(/facebook\.com\/groups\//.test(u)) return {fbGroup:true};
   if(/facebook\.com\/(reel\/|.+\/videos\/|watch)/.test(u)) return {src:`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(u)}&show_text=false&width=500`,h:/\/reel\//.test(u)?620:340};
   if(/facebook\.com\/(.+\/posts\/|.+\/permalink\/|permalink\.php|story\.php|photo\.php|photo\/|.+\/photos\/)/.test(u)) return {src:`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(u)}&show_text=true&width=500`,h:560};
   return null;
@@ -877,6 +878,8 @@ function renderPlayer(l){
   const pl=$("#sPlayer");clearPlayer();const id=l.id;
   if(l.gone){pl.appendChild(plMsg("alert","這則貼文已無法觀看",`${l.platform} 回報這則貼文已不存在或無法公開觀看（可能已被作者刪除），所以無法播放。`,true));return;}
   if(!l.embed)return;
+  if(l.embed.fbGroup){const o=el("a",{class:"btn btn-primary",href:l.src,target:"_blank",rel:"noopener noreferrer"});o.appendChild(ic("ext"));o.appendChild(document.createTextNode("在 Facebook 打開"));
+    pl.appendChild(el("div",{class:"pl-msg gone"},[el("div",{class:"ic"},[ic("p-fb")]),el("b",{text:"這是 Facebook 社團貼文"}),el("p",{text:"Facebook 不允許其他網站顯示社團貼文，請到 Facebook 觀看。社團若是私人社團，需要先加入才看得到。"}),o]));return;}
   if(quiet&&!forceLoad){
     const b=el("button",{class:"btn btn-primary",type:"button"});setBtn(b,"play","只播放這一堂");
     b.addEventListener("click",()=>{forceLoad=true;renderPlayer(l);updateCtl(l);});
@@ -904,7 +907,7 @@ function renderPlayer(l){
   else{const fr=iframeFor(l);pl.appendChild(fr);const done=loader(pl,`${l.platform} 播放器載入中…`);fr.addEventListener("load",done);}
 }
 function updateCtl(l){
-  const has=!!(l&&l.embed&&!l.gone&&!(quiet&&!forceLoad));$("#sCtl").hidden=!has;if(!has)return;
+  const has=!!(l&&l.embed&&!l.embed.fbGroup&&!l.gone&&!(quiet&&!forceLoad));$("#sCtl").hidden=!has;if(!has)return;
   setBtn($("#sStop"),stopped?"play":"stop",stopped?"重新載入播放器":"停止播放");
   const fb=isFbVideo(l),m=$("#sMute");m.hidden=!fb;
   m.setAttribute("aria-pressed",String(fbMute));setBtn(m,fbMute?"vol-x":"vol",fbMute?"Facebook 靜音：開":"Facebook 靜音：關");
